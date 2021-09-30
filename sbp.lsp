@@ -23,38 +23,30 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (challenge id secret request iv answer cookie syskey data) (proxy ca name) )
+    (vars (challenge id secret request answer cookie syskey data) (proxy name) )
     (trace
       (send challenge)
-      (recv (cat id (pubk proxy) (enc proxy (pubk proxy) (privk ca))))
+      (recv id)
       (send (enc secret (pubk proxy)))
       (send (enc id (hash secret challenge id)))
       (recv (enc challenge (hash secret challenge id)))
       (send request)
-      (recv (cat answer iv (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv (cat answer (enc cookie (hash syskey (hash secret challenge id)))))
     )
   )
   
   (defrole proxy
-    (vars (challenge id secret request iv answer cookie syskey data) (proxy ca name) )
+    (vars (challenge id secret request answer cookie syskey data) (proxy name) )
     (trace
-      (obsv (enc proxy (pubk proxy) (privk ca)))
       (recv challenge)
-      (send (cat id (pubk proxy) (enc proxy (pubk proxy) (privk ca))))
+      (send id)
       (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret challenge id)))
       (send (enc challenge (hash secret challenge id)))
       (recv request)
       (init request)
       (obsv (cat answer cookie))
-      (send (cat answer iv (enc cookie (hash syskey (hash secret challenge id)))))
-    )
-  )
-  
-  (defrole certauth
-    (vars (proxy ca name) )
-    (trace
-      (init (enc proxy (pubk proxy) (privk ca)))
+      (send (cat answer (enc cookie (hash syskey (hash secret challenge id)))))
     )
   )
   
@@ -68,12 +60,12 @@
 )
 
 (defskeleton sbp
-  (vars (challenge secret id syskey data) (proxy ca name) )
-  (defstrandmax client (challenge challenge) (secret secret) (proxy proxy) (ca ca) (id id) (syskey syskey) )
+  (vars (challenge secret id syskey data) (proxy name) )
+  (defstrandmax client (challenge challenge) (secret secret) (proxy proxy) (id id) (syskey syskey) )
   ;;(deflistener (hash secret challenge id))
   (uniq-orig challenge)
   (uniq-orig secret)
   (non-orig (privk proxy))
-  (non-orig (privk ca))
   (non-orig syskey)
+  (pen-non-orig (pubk proxy))
 )
