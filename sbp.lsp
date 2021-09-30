@@ -23,33 +23,23 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (challenge id secret request request2 answer answer2 cookie syskey data) (proxy name) )
+    (vars (request request2 answer answer2 cookie syskey tlskey data) )
     (trace
-      (send challenge)
-      (recv id)
-      (send (enc secret (pubk proxy)))
-      (send (enc id (hash secret challenge id)))
-      (recv (enc challenge (hash secret challenge id)))
       (send request)
-      (recv (cat answer (enc cookie (hash syskey (hash secret challenge id)))))
-      (send (cat request2 (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv (cat answer (enc cookie (hash syskey tlskey))))
+      (send (cat request2 (enc cookie (hash syskey tlskey))))
       (recv answer2)
     )
   )
   
   (defrole proxy
-    (vars (challenge id secret request request2 answer answer2 cookie syskey data) (proxy name) )
+    (vars (request request2 answer answer2 cookie syskey tlskey data) )
     (trace
-      (recv challenge)
-      (send id)
-      (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id)))
       (recv request)
       (init request)
       (obsv (cat answer cookie))
-      (send (cat answer (enc cookie (hash syskey (hash secret challenge id)))))
-      (recv (cat request2 (enc cookie (hash syskey (hash secret challenge id)))))
+      (send (cat answer (enc cookie (hash syskey tlskey))))
+      (recv (cat request2 (enc cookie (hash syskey tlskey))))
       (init (cat request2 cookie))
       (obsv answer2)
       (send answer2)
@@ -67,12 +57,17 @@
 )
 
 (defskeleton sbp
-  (vars (challenge secret id syskey data) (proxy name) )
-  (defstrandmax client (challenge challenge) (secret secret) (proxy proxy) (id id) (syskey syskey) )
-  ;;(deflistener (hash secret challenge id))
-  (uniq-orig challenge)
-  (uniq-orig secret)
-  (non-orig (privk proxy))
+  (vars (syskey tlskey data) )
+  (defstrandmax proxy (syskey syskey) (tlskey tlskey) )
+  (defstrandmax client (syskey syskey) (tlskey tlskey) )
   (non-orig syskey)
-  (pen-non-orig (pubk proxy))
+  (pen-non-orig tlskey)
 )
+
+;;(defskeleton sbp
+;;  (vars (syskey tlskey data) )
+;;  (defstrandmax client (syskey syskey) (tlskey tlskey) )
+;;  (non-orig syskey)
+;;  (pen-non-orig tlskey)
+;;)
+
