@@ -23,7 +23,7 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (challenge id secret request answer cookie syskey data) (proxy name) )
+    (vars (challenge id secret request request2 answer answer2 cookie syskey data) (proxy name) )
     (trace
       (send challenge)
       (recv id)
@@ -32,11 +32,13 @@
       (recv (enc challenge (hash secret challenge id)))
       (send request)
       (recv (cat answer (enc cookie (hash syskey (hash secret challenge id)))))
+      (send (cat request2 (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2)
     )
   )
   
   (defrole proxy
-    (vars (challenge id secret request answer cookie syskey data) (proxy name) )
+    (vars (challenge id secret request request2 answer answer2 cookie syskey data) (proxy name) )
     (trace
       (recv challenge)
       (send id)
@@ -47,13 +49,18 @@
       (init request)
       (obsv (cat answer cookie))
       (send (cat answer (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv (cat request2 (enc cookie (hash syskey (hash secret challenge id)))))
+      (init (cat request2 cookie))
+      (obsv answer2)
+      (send answer2)
     )
   )
   
   (defrole server
-    (vars (request answer cookie data) )
+    (vars (request request2 answer answer2 cookie data) )
     (trace 
       (tran request (cat answer cookie))
+      (tran (cat request2 cookie) answer2)
     )
   )
     

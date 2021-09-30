@@ -9,34 +9,46 @@
 
 (defprotocol sbp basic
   (defrole client
-    (vars (challenge id secret request answer cookie syskey data)
-      (proxy name))
+    (vars
+      (challenge id secret request request2 answer answer2 cookie syskey
+        data) (proxy name))
     (trace (send challenge) (recv id) (send (enc secret (pubk proxy)))
       (send (enc id (hash secret challenge id)))
       (recv (enc challenge (hash secret challenge id))) (send request)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash secret challenge id)))))))
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2)))
   (defrole proxy
-    (vars (challenge id secret request answer cookie syskey data)
-      (proxy name))
+    (vars
+      (challenge id secret request request2 answer answer2 cookie syskey
+        data) (proxy name))
     (trace (recv challenge) (send id) (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret challenge id)))
       (send (enc challenge (hash secret challenge id))) (recv request)
       (init request) (obsv (cat answer cookie))
       (send
         (cat answer
-          (enc cookie (hash syskey (hash secret challenge id)))))))
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (init (cat request2 cookie)) (obsv answer2) (send answer2)))
   (defrole server
-    (vars (request answer cookie data))
-    (trace (tran request (cat answer cookie)))))
+    (vars (request request2 answer answer2 cookie data))
+    (trace (tran request (cat answer cookie))
+      (tran (cat request2 cookie) answer2))))
 
 (defskeleton sbp
-  (vars (challenge secret id syskey request answer cookie data)
-    (proxy name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+  (vars
+    (challenge secret id syskey request request2 answer answer2 cookie
+      data) (proxy name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (non-orig syskey (privk proxy))
   (pen-non-orig (pubk proxy))
   (uniq-orig challenge secret)
@@ -46,18 +58,23 @@
       (recv (enc challenge (hash secret challenge id))) (send request)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash secret challenge id)))))))
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2)))
   (label 0)
   (unrealized (0 4) (0 6))
   (origs (challenge (0 0)) (secret (0 2)))
   (comment "3 in cohort - 3 not yet seen"))
 
 (defskeleton sbp
-  (vars (id syskey request answer request-0 answer-0 cookie data)
-    (proxy proxy-0 name))
-  (defstrand client 7 (challenge id) (id id) (secret request)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+  (vars
+    (id syskey request request2 answer answer2 request-0 answer-0 cookie
+      data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 9 (challenge id) (id id) (secret request)
     (request request-0) (answer answer-0) (cookie cookie)
     (syskey syskey) (proxy proxy-0))
@@ -75,7 +92,10 @@
       (send (enc id (hash request id id)))
       (recv (enc id (hash request id id))) (send request)
       (recv
-        (cat answer (enc cookie (hash syskey (hash request id id))))))
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
     ((recv id) (send id) (recv (enc request (pubk proxy-0)))
       (recv (enc id (hash request id id)))
       (send (enc id (hash request id id))) (recv request-0)
@@ -83,24 +103,25 @@
       (send
         (cat answer-0 (enc cookie (hash syskey (hash request id id))))))
     ((tran request-0 (cat answer-0 cookie))))
-  (label 27)
+  (label 54)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge id) (secret request) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (id (0 0)) (request (0 2))))
 
 (defskeleton sbp
   (vars
-    (id syskey request answer request-0 answer-0 cookie challenge id-0
-      secret request-1 data) (proxy proxy-0 proxy-1 name))
-  (defstrand client 7 (challenge id) (id id) (secret request)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+    (id syskey request request2 answer answer2 request-0 answer-0 cookie
+      challenge id-0 secret request-1 data)
+    (proxy proxy-0 proxy-1 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 9 (challenge id) (id id) (secret request)
     (request request-0) (answer answer-0) (cookie cookie)
     (syskey syskey) (proxy proxy-0))
@@ -120,7 +141,10 @@
       (send (enc id (hash request id id)))
       (recv (enc id (hash request id id))) (send request)
       (recv
-        (cat answer (enc cookie (hash syskey (hash request id id))))))
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
     ((recv id) (send id) (recv (enc request (pubk proxy-0)))
       (recv (enc id (hash request id id)))
       (send (enc id (hash request id id))) (recv request-0)
@@ -132,23 +156,24 @@
       (recv (enc id-0 (hash secret challenge id-0)))
       (send (enc challenge (hash secret challenge id-0)))
       (recv request-1) (init request-1)))
-  (label 28)
+  (label 55)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge id) (secret request) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (id (0 0)) (request (0 2))))
 
 (defskeleton sbp
-  (vars (secret id syskey request answer request-0 answer-0 cookie data)
-    (proxy name))
-  (defstrand client 7 (challenge id) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+  (vars
+    (secret id syskey request request2 answer answer2 request-0 answer-0
+      cookie data) (proxy name))
+  (defstrand client 9 (challenge id) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 9 (challenge id) (id id) (secret secret)
     (request request-0) (answer answer-0) (cookie cookie)
     (syskey syskey) (proxy proxy))
@@ -165,8 +190,10 @@
     ((send id) (recv id) (send (enc secret (pubk proxy)))
       (send (enc id (hash secret id id)))
       (recv (enc id (hash secret id id))) (send request)
-      (recv
-        (cat answer (enc cookie (hash syskey (hash secret id id))))))
+      (recv (cat answer (enc cookie (hash syskey (hash secret id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash secret id id)))))
+      (recv answer2))
     ((recv id) (send id) (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret id id)))
       (send (enc id (hash secret id id))) (recv request-0)
@@ -174,24 +201,25 @@
       (send
         (cat answer-0 (enc cookie (hash syskey (hash secret id id))))))
     ((tran request-0 (cat answer-0 cookie))))
-  (label 38)
+  (label 107)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge id) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (id (0 0)) (secret (0 2))))
 
 (defskeleton sbp
   (vars
-    (secret id syskey request answer request-0 answer-0 cookie challenge
-      id-0 secret-0 request-1 data) (proxy proxy-0 name))
-  (defstrand client 7 (challenge id) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+    (secret id syskey request request2 answer answer2 request-0 answer-0
+      cookie challenge id-0 secret-0 request-1 data)
+    (proxy proxy-0 name))
+  (defstrand client 9 (challenge id) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 9 (challenge id) (id id) (secret secret)
     (request request-0) (answer answer-0) (cookie cookie)
     (syskey syskey) (proxy proxy))
@@ -210,8 +238,10 @@
     ((send id) (recv id) (send (enc secret (pubk proxy)))
       (send (enc id (hash secret id id)))
       (recv (enc id (hash secret id id))) (send request)
-      (recv
-        (cat answer (enc cookie (hash syskey (hash secret id id))))))
+      (recv (cat answer (enc cookie (hash syskey (hash secret id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash secret id id)))))
+      (recv answer2))
     ((recv id) (send id) (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret id id)))
       (send (enc id (hash secret id id))) (recv request-0)
@@ -223,24 +253,217 @@
       (recv (enc id-0 (hash secret-0 challenge id-0)))
       (send (enc challenge (hash secret-0 challenge id-0)))
       (recv request-1) (init request-1)))
-  (label 39)
+  (label 108)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge id) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (id (0 0)) (secret (0 2))))
 
 (defskeleton sbp
   (vars
-    (challenge secret id syskey request answer request-0 answer-0 cookie
-      data) (proxy name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 answer-0 cookie data)
+    (proxy proxy-0 proxy-1 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer answer-0)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand server 1 (request request-0) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 6) (3 0)) ((1 8) (0 6))
+    ((2 10) (1 7)) ((3 0) (2 7)))
+  (leadsto ((1 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 4 1 proxy 7) request-2 (3 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-0 (cat answer-0 cookie))))
+  (label 116)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 answer-0 cookie data)
+    (proxy proxy-0 proxy-1 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer answer-0)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand server 1 (request request-1) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 8) (0 6)) ((2 6) (3 0))
+    ((2 10) (1 7)) ((3 0) (2 7)))
+  (leadsto ((2 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 4 2 proxy 7) request-2 (3 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-1 (cat answer-0 cookie))))
+  (label 117)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 answer-0 cookie challenge-0
+      id-1 secret-0 request-2 data)
+    (proxy proxy-0 proxy-1 proxy-2 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer answer-0)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand server 1 (request request-2) (answer answer-0)
+    (cookie cookie))
+  (defstrand proxy 7 (challenge challenge-0) (id id-1) (secret secret-0)
+    (request request-2) (proxy proxy-2))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 8) (0 6)) ((2 10) (1 7))
+    ((3 0) (2 7)) ((4 6) (3 0)))
+  (leadsto ((2 10) (1 7)) ((3 0) (2 7)) ((4 6) (3 0)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (added-strand proxy 7) request-2 (3 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-2 (cat answer-0 cookie)))
+    ((recv challenge-0) (send id-1) (recv (enc secret-0 (pubk proxy-2)))
+      (recv (enc id-1 (hash secret-0 challenge-0 id-1)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-1)))
+      (recv request-2) (init request-2)))
+  (label 118)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (challenge secret id syskey request request2 answer answer2
+      request-0 answer-0 cookie data) (proxy name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
     (request request-0) (answer answer-0) (cookie cookie)
     (syskey syskey) (proxy proxy))
@@ -259,7 +482,11 @@
       (recv (enc challenge (hash secret challenge id))) (send request)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash secret challenge id))))))
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2))
     ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret challenge id)))
       (send (enc challenge (hash secret challenge id))) (recv request-0)
@@ -268,24 +495,25 @@
         (cat answer-0
           (enc cookie (hash syskey (hash secret challenge id))))))
     ((tran request-0 (cat answer-0 cookie))))
-  (label 43)
+  (label 144)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge challenge) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (challenge (0 0)) (secret (0 2))))
 
 (defskeleton sbp
   (vars
-    (challenge secret id syskey request answer request-0 answer-0 cookie
-      challenge-0 id-0 secret-0 request-1 data) (proxy proxy-0 name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+    (challenge secret id syskey request request2 answer answer2
+      request-0 answer-0 cookie challenge-0 id-0 secret-0 request-1
+      data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
     (request request-0) (answer answer-0) (cookie cookie)
     (syskey syskey) (proxy proxy))
@@ -306,7 +534,11 @@
       (recv (enc challenge (hash secret challenge id))) (send request)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash secret challenge id))))))
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2))
     ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret challenge id)))
       (send (enc challenge (hash secret challenge id))) (recv request-0)
@@ -319,24 +551,851 @@
       (recv (enc id-0 (hash secret-0 challenge-0 id-0)))
       (send (enc challenge-0 (hash secret-0 challenge-0 id-0)))
       (recv request-1) (init request-1)))
-  (label 44)
+  (label 145)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge challenge) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (challenge (0 0)) (secret (0 2))))
 
 (defskeleton sbp
   (vars
-    (syskey answer request answer-0 cookie challenge id secret request-0
-      data) (proxy proxy-0 name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request secret) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy-0))
+    (secret id syskey request request2 answer answer2 request-0
+      challenge id-0 secret-0 request-1 request2-0 syskey-0 answer-0
+      cookie data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge id) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret secret)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret-0)
+    (request request-1) (request2 request2-0) (answer answer-0)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-0))
+  (defstrand server 1 (request request-0) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((1 6) (3 0))
+    ((1 8) (0 6)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (leadsto ((1 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig secret id)
+  (operation state-passing-test (displaced 4 1 proxy 7) request-2 (3 0))
+  (traces
+    ((send id) (recv id) (send (enc secret (pubk proxy)))
+      (send (enc id (hash secret id id)))
+      (recv (enc id (hash secret id id))) (send request)
+      (recv (cat answer (enc cookie (hash syskey (hash secret id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash secret id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc secret (pubk proxy)))
+      (recv (enc id (hash secret id id)))
+      (send (enc id (hash secret id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash secret id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
+      (recv (enc id-0 (hash secret-0 challenge id-0)))
+      (send (enc challenge (hash secret-0 challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie (hash syskey-0 (hash secret-0 challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret-0 challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-0 (cat answer-0 cookie))))
+  (label 255)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret secret) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (secret (0 2))))
+
+(defskeleton sbp
+  (vars
+    (secret id syskey request request2 answer answer2 request-0
+      challenge id-0 secret-0 request-1 request2-0 syskey-0 answer-0
+      cookie data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge id) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret secret)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret-0)
+    (request request-1) (request2 request2-0) (answer answer-0)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-0))
+  (defstrand server 1 (request request-1) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((1 8) (0 6))
+    ((2 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (leadsto ((2 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig secret id)
+  (operation state-passing-test (displaced 4 2 proxy 7) request-2 (3 0))
+  (traces
+    ((send id) (recv id) (send (enc secret (pubk proxy)))
+      (send (enc id (hash secret id id)))
+      (recv (enc id (hash secret id id))) (send request)
+      (recv (cat answer (enc cookie (hash syskey (hash secret id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash secret id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc secret (pubk proxy)))
+      (recv (enc id (hash secret id id)))
+      (send (enc id (hash secret id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash secret id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
+      (recv (enc id-0 (hash secret-0 challenge id-0)))
+      (send (enc challenge (hash secret-0 challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie (hash syskey-0 (hash secret-0 challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret-0 challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-1 (cat answer-0 cookie))))
+  (label 256)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret secret) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (secret (0 2))))
+
+(defskeleton sbp
+  (vars
+    (secret id syskey request request2 answer answer2 request-0
+      challenge id-0 secret-0 request-1 request2-0 syskey-0 answer-0
+      cookie challenge-0 id-1 secret-1 request-2 data)
+    (proxy proxy-0 proxy-1 name))
+  (defstrand client 9 (challenge id) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret secret)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret-0)
+    (request request-1) (request2 request2-0) (answer answer-0)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-0))
+  (defstrand server 1 (request request-2) (answer answer-0)
+    (cookie cookie))
+  (defstrand proxy 7 (challenge challenge-0) (id id-1) (secret secret-1)
+    (request request-2) (proxy proxy-1))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((1 8) (0 6))
+    ((2 10) (1 7)) ((3 0) (2 7)) ((4 6) (3 0)))
+  (leadsto ((2 10) (1 7)) ((3 0) (2 7)) ((4 6) (3 0)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig secret id)
+  (operation state-passing-test (added-strand proxy 7) request-2 (3 0))
+  (traces
+    ((send id) (recv id) (send (enc secret (pubk proxy)))
+      (send (enc id (hash secret id id)))
+      (recv (enc id (hash secret id id))) (send request)
+      (recv (cat answer (enc cookie (hash syskey (hash secret id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash secret id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc secret (pubk proxy)))
+      (recv (enc id (hash secret id id)))
+      (send (enc id (hash secret id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash secret id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
+      (recv (enc id-0 (hash secret-0 challenge id-0)))
+      (send (enc challenge (hash secret-0 challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie (hash syskey-0 (hash secret-0 challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret-0 challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-2 (cat answer-0 cookie)))
+    ((recv challenge-0) (send id-1) (recv (enc secret-1 (pubk proxy-1)))
+      (recv (enc id-1 (hash secret-1 challenge-0 id-1)))
+      (send (enc challenge-0 (hash secret-1 challenge-0 id-1)))
+      (recv request-2) (init request-2)))
+  (label 257)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret secret) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (secret (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 challenge-0 id-1 secret-0
+      request-2 request2-1 syskey-1 answer-0 cookie data)
+    (proxy proxy-0 proxy-1 proxy-2 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer request2-1)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand proxy 11 (challenge challenge-0) (id id-1)
+    (secret secret-0) (request request-2) (request2 request2-1)
+    (answer answer-0) (cookie cookie) (syskey syskey-1) (proxy proxy-2))
+  (defstrand server 1 (request request-0) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 6) (4 0)) ((1 8) (0 6))
+    ((2 10) (1 7)) ((3 10) (2 7)) ((4 0) (3 7)))
+  (leadsto ((1 6) (4 0)) ((2 10) (1 7)) ((3 10) (2 7)) ((4 0) (3 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 5 1 proxy 7) request-3 (4 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat request2-1 cookie))
+      (send
+        (cat request2-1
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((recv challenge-0) (send id-1) (recv (enc secret-0 (pubk proxy-2)))
+      (recv (enc id-1 (hash secret-0 challenge-0 id-1)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-1)))
+      (recv request-2) (init request-2) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (recv
+        (cat request2-1
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (init (cat request2-1 cookie)))
+    ((tran request-0 (cat answer-0 cookie))))
+  (label 270)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 challenge-0 id-1 secret-0
+      request-2 request2-1 syskey-1 answer-0 cookie data)
+    (proxy proxy-0 proxy-1 proxy-2 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer request2-1)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand proxy 11 (challenge challenge-0) (id id-1)
+    (secret secret-0) (request request-2) (request2 request2-1)
+    (answer answer-0) (cookie cookie) (syskey syskey-1) (proxy proxy-2))
+  (defstrand server 1 (request request-1) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 8) (0 6)) ((2 6) (4 0))
+    ((2 10) (1 7)) ((3 10) (2 7)) ((4 0) (3 7)))
+  (leadsto ((2 6) (4 0)) ((2 10) (1 7)) ((3 10) (2 7)) ((4 0) (3 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 5 2 proxy 7) request-3 (4 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat request2-1 cookie))
+      (send
+        (cat request2-1
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((recv challenge-0) (send id-1) (recv (enc secret-0 (pubk proxy-2)))
+      (recv (enc id-1 (hash secret-0 challenge-0 id-1)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-1)))
+      (recv request-2) (init request-2) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (recv
+        (cat request2-1
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (init (cat request2-1 cookie)))
+    ((tran request-1 (cat answer-0 cookie))))
+  (label 271)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 challenge-0 id-1 secret-0
+      request-2 request2-1 syskey-1 answer-0 cookie data)
+    (proxy proxy-0 proxy-1 proxy-2 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer request2-1)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand proxy 11 (challenge challenge-0) (id id-1)
+    (secret secret-0) (request request-2) (request2 request2-1)
+    (answer answer-0) (cookie cookie) (syskey syskey-1) (proxy proxy-2))
+  (defstrand server 1 (request request-2) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 8) (0 6)) ((2 10) (1 7))
+    ((3 6) (4 0)) ((3 10) (2 7)) ((4 0) (3 7)))
+  (leadsto ((2 10) (1 7)) ((3 6) (4 0)) ((3 10) (2 7)) ((4 0) (3 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 5 3 proxy 7) request-3 (4 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat request2-1 cookie))
+      (send
+        (cat request2-1
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((recv challenge-0) (send id-1) (recv (enc secret-0 (pubk proxy-2)))
+      (recv (enc id-1 (hash secret-0 challenge-0 id-1)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-1)))
+      (recv request-2) (init request-2) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (recv
+        (cat request2-1
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (init (cat request2-1 cookie)))
+    ((tran request-2 (cat answer-0 cookie))))
+  (label 272)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 challenge id-0
+      secret request-1 request2-0 syskey-0 challenge-0 id-1 secret-0
+      request-2 request2-1 syskey-1 answer-0 cookie challenge-1 id-2
+      secret-1 request-3 data)
+    (proxy proxy-0 proxy-1 proxy-2 proxy-3 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand proxy 11 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (request2 request2-0) (answer request2-1)
+    (cookie cookie) (syskey syskey-0) (proxy proxy-1))
+  (defstrand proxy 11 (challenge challenge-0) (id id-1)
+    (secret secret-0) (request request-2) (request2 request2-1)
+    (answer answer-0) (cookie cookie) (syskey syskey-1) (proxy proxy-2))
+  (defstrand server 1 (request request-3) (answer answer-0)
+    (cookie cookie))
+  (defstrand proxy 7 (challenge challenge-1) (id id-2) (secret secret-1)
+    (request request-3) (proxy proxy-3))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 8) (0 6)) ((2 10) (1 7))
+    ((3 10) (2 7)) ((4 0) (3 7)) ((5 6) (4 0)))
+  (leadsto ((2 10) (1 7)) ((3 10) (2 7)) ((4 0) (3 7)) ((5 6) (4 0)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (added-strand proxy 7) request-3 (4 0))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash request id id))))))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1) (obsv (cat request2-1 cookie))
+      (send
+        (cat request2-1
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie (hash syskey-0 (hash secret challenge id-0)))))
+      (init (cat request2-0 cookie)))
+    ((recv challenge-0) (send id-1) (recv (enc secret-0 (pubk proxy-2)))
+      (recv (enc id-1 (hash secret-0 challenge-0 id-1)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-1)))
+      (recv request-2) (init request-2) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (recv
+        (cat request2-1
+          (enc cookie
+            (hash syskey-1 (hash secret-0 challenge-0 id-1)))))
+      (init (cat request2-1 cookie)))
+    ((tran request-3 (cat answer-0 cookie)))
+    ((recv challenge-1) (send id-2) (recv (enc secret-1 (pubk proxy-3)))
+      (recv (enc id-2 (hash secret-1 challenge-1 id-2)))
+      (send (enc challenge-1 (hash secret-1 challenge-1 id-2)))
+      (recv request-3) (init request-3)))
+  (label 273)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 answer-0 cookie
+      answer-1 answer2-0 cookie-0 data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer answer-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand server 1 (request answer2-0) (answer answer-0)
+    (cookie cookie))
+  (defstrand server 2 (request request-0) (request2 answer-1)
+    (answer answer-1) (answer2 answer2-0) (cookie cookie-0))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 6) (3 0)) ((1 8) (0 6))
+    ((2 0) (1 7)) ((3 1) (2 0)))
+  (leadsto ((1 6) (3 0)) ((2 0) (1 7)) ((3 0) (3 1)) ((3 1) (2 0)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 4 3 server 1)
+    (cat answer-2 cookie-0) (3 1))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0 (enc cookie (hash syskey (hash request id id))))))
+    ((tran answer2-0 (cat answer-0 cookie)))
+    ((tran request-0 (cat answer-1 cookie-0))
+      (tran (cat answer-1 cookie-0) answer2-0)))
+  (label 280)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (id syskey request request2 answer answer2 request-0 answer-0 cookie
+      answer-1 answer2-0 challenge id-0 secret request-1 cookie-0 data)
+    (proxy proxy-0 proxy-1 name))
+  (defstrand client 9 (challenge id) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge id) (id id) (secret request)
+    (request request-0) (answer answer-0) (cookie cookie)
+    (syskey syskey) (proxy proxy-0))
+  (defstrand server 1 (request answer2-0) (answer answer-0)
+    (cookie cookie))
+  (defstrand server 2 (request request-1) (request2 answer-1)
+    (answer answer-1) (answer2 answer2-0) (cookie cookie-0))
+  (defstrand proxy 7 (challenge challenge) (id id-0) (secret secret)
+    (request request-1) (proxy proxy-1))
+  (precedes ((0 0) (1 0)) ((0 5) (1 2)) ((1 8) (0 6)) ((2 0) (1 7))
+    ((3 1) (2 0)) ((4 6) (3 0)))
+  (leadsto ((2 0) (1 7)) ((3 0) (3 1)) ((3 1) (2 0)) ((4 6) (3 0)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig id request)
+  (operation state-passing-test (displaced 5 3 server 1)
+    (cat answer-2 cookie-0) (3 1))
+  (traces
+    ((send id) (recv id) (send (enc request (pubk proxy)))
+      (send (enc id (hash request id id)))
+      (recv (enc id (hash request id id))) (send request)
+      (recv
+        (cat answer (enc cookie (hash syskey (hash request id id)))))
+      (send
+        (cat request2 (enc cookie (hash syskey (hash request id id)))))
+      (recv answer2))
+    ((recv id) (send id) (recv (enc request (pubk proxy-0)))
+      (recv (enc id (hash request id id)))
+      (send (enc id (hash request id id))) (recv request-0)
+      (init request-0) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0 (enc cookie (hash syskey (hash request id id))))))
+    ((tran answer2-0 (cat answer-0 cookie)))
+    ((tran request-1 (cat answer-1 cookie-0))
+      (tran (cat answer-1 cookie-0) answer2-0))
+    ((recv challenge) (send id-0) (recv (enc secret (pubk proxy-1)))
+      (recv (enc id-0 (hash secret challenge id-0)))
+      (send (enc challenge (hash secret challenge id-0)))
+      (recv request-1) (init request-1)))
+  (label 284)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge id) (secret request) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (id (0 0)) (request (0 2))))
+
+(defskeleton sbp
+  (vars
+    (challenge secret id syskey request request2 answer answer2
+      request-0 challenge-0 id-0 secret-0 request-1 request2-0 syskey-0
+      answer-0 cookie data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy))
+  (defstrand proxy 11 (challenge challenge-0) (id id-0)
+    (secret secret-0) (request request-1) (request2 request2-0)
+    (answer answer-0) (cookie cookie) (syskey syskey-0) (proxy proxy-0))
+  (defstrand server 1 (request request-0) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((1 4) (0 4))
+    ((1 6) (3 0)) ((1 8) (0 6)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (leadsto ((1 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig challenge secret)
+  (operation state-passing-test (displaced 4 1 proxy 7) request-2 (3 0))
+  (traces
+    ((send challenge) (recv id) (send (enc secret (pubk proxy)))
+      (send (enc id (hash secret challenge id)))
+      (recv (enc challenge (hash secret challenge id))) (send request)
+      (recv
+        (cat answer
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2))
+    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
+      (recv (enc id (hash secret challenge id)))
+      (send (enc challenge (hash secret challenge id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash secret challenge id))))))
+    ((recv challenge-0) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
+      (recv (enc id-0 (hash secret-0 challenge-0 id-0)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-0 (hash secret-0 challenge-0 id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie
+            (hash syskey-0 (hash secret-0 challenge-0 id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-0 (cat answer-0 cookie))))
+  (label 364)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge challenge) (secret secret) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (challenge (0 0)) (secret (0 2))))
+
+(defskeleton sbp
+  (vars
+    (challenge secret id syskey request request2 answer answer2
+      request-0 challenge-0 id-0 secret-0 request-1 request2-0 syskey-0
+      answer-0 cookie data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy))
+  (defstrand proxy 11 (challenge challenge-0) (id id-0)
+    (secret secret-0) (request request-1) (request2 request2-0)
+    (answer answer-0) (cookie cookie) (syskey syskey-0) (proxy proxy-0))
+  (defstrand server 1 (request request-1) (answer answer-0)
+    (cookie cookie))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((1 4) (0 4))
+    ((1 8) (0 6)) ((2 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (leadsto ((2 6) (3 0)) ((2 10) (1 7)) ((3 0) (2 7)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig challenge secret)
+  (operation state-passing-test (displaced 4 2 proxy 7) request-2 (3 0))
+  (traces
+    ((send challenge) (recv id) (send (enc secret (pubk proxy)))
+      (send (enc id (hash secret challenge id)))
+      (recv (enc challenge (hash secret challenge id))) (send request)
+      (recv
+        (cat answer
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2))
+    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
+      (recv (enc id (hash secret challenge id)))
+      (send (enc challenge (hash secret challenge id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash secret challenge id))))))
+    ((recv challenge-0) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
+      (recv (enc id-0 (hash secret-0 challenge-0 id-0)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-0 (hash secret-0 challenge-0 id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie
+            (hash syskey-0 (hash secret-0 challenge-0 id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-1 (cat answer-0 cookie))))
+  (label 365)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge challenge) (secret secret) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (challenge (0 0)) (secret (0 2))))
+
+(defskeleton sbp
+  (vars
+    (challenge secret id syskey request request2 answer answer2
+      request-0 challenge-0 id-0 secret-0 request-1 request2-0 syskey-0
+      answer-0 cookie challenge-1 id-1 secret-1 request-2 data)
+    (proxy proxy-0 proxy-1 name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
+  (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
+    (request request-0) (answer request2-0) (cookie cookie)
+    (syskey syskey) (proxy proxy))
+  (defstrand proxy 11 (challenge challenge-0) (id id-0)
+    (secret secret-0) (request request-1) (request2 request2-0)
+    (answer answer-0) (cookie cookie) (syskey syskey-0) (proxy proxy-0))
+  (defstrand server 1 (request request-2) (answer answer-0)
+    (cookie cookie))
+  (defstrand proxy 7 (challenge challenge-1) (id id-1) (secret secret-1)
+    (request request-2) (proxy proxy-1))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((1 4) (0 4))
+    ((1 8) (0 6)) ((2 10) (1 7)) ((3 0) (2 7)) ((4 6) (3 0)))
+  (leadsto ((2 10) (1 7)) ((3 0) (2 7)) ((4 6) (3 0)))
+  (non-orig syskey (privk proxy))
+  (pen-non-orig (pubk proxy))
+  (uniq-orig challenge secret)
+  (operation state-passing-test (added-strand proxy 7) request-2 (3 0))
+  (traces
+    ((send challenge) (recv id) (send (enc secret (pubk proxy)))
+      (send (enc id (hash secret challenge id)))
+      (recv (enc challenge (hash secret challenge id))) (send request)
+      (recv
+        (cat answer
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2))
+    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
+      (recv (enc id (hash secret challenge id)))
+      (send (enc challenge (hash secret challenge id))) (recv request-0)
+      (init request-0) (obsv (cat request2-0 cookie))
+      (send
+        (cat request2-0
+          (enc cookie (hash syskey (hash secret challenge id))))))
+    ((recv challenge-0) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
+      (recv (enc id-0 (hash secret-0 challenge-0 id-0)))
+      (send (enc challenge-0 (hash secret-0 challenge-0 id-0)))
+      (recv request-1) (init request-1) (obsv (cat answer-0 cookie))
+      (send
+        (cat answer-0
+          (enc cookie
+            (hash syskey-0 (hash secret-0 challenge-0 id-0)))))
+      (recv
+        (cat request2-0
+          (enc cookie
+            (hash syskey-0 (hash secret-0 challenge-0 id-0)))))
+      (init (cat request2-0 cookie)))
+    ((tran request-2 (cat answer-0 cookie)))
+    ((recv challenge-1) (send id-1) (recv (enc secret-1 (pubk proxy-1)))
+      (recv (enc id-1 (hash secret-1 challenge-1 id-1)))
+      (send (enc challenge-1 (hash secret-1 challenge-1 id-1)))
+      (recv request-2) (init request-2)))
+  (label 366)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((challenge challenge) (secret secret) (id id) (syskey syskey)
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
+  (origs (challenge (0 0)) (secret (0 2))))
+
+(defskeleton sbp
+  (vars
+    (syskey request2 answer answer2 request answer-0 cookie challenge id
+      secret request-0 data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge challenge) (id id) (secret secret)
+    (request secret) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy-0))
   (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
     (request request) (answer answer-0) (cookie cookie) (syskey syskey)
     (proxy proxy))
@@ -358,7 +1417,11 @@
       (recv (enc challenge (hash secret challenge id))) (send secret)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash secret challenge id))))))
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash secret challenge id)))))
+      (recv answer2))
     ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
       (recv (enc id (hash secret challenge id)))
       (send (enc challenge (hash secret challenge id))) (recv request)
@@ -371,24 +1434,24 @@
       (recv (enc id (hash secret challenge id)))
       (send (enc challenge (hash secret challenge id))) (recv request-0)
       (init request-0)))
-  (label 51)
+  (label 380)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge challenge) (secret secret) (id id) (syskey syskey)
-        (proxy proxy-0) (request secret) (answer answer)
-        (cookie cookie))))
+        (proxy proxy-0) (request secret) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (challenge (0 0)) (secret (0 2))))
 
 (defskeleton sbp
   (vars
-    (challenge id syskey request answer request-0 answer-0 cookie data)
-    (proxy proxy-0 name))
-  (defstrand client 7 (challenge challenge) (id id) (secret request)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+    (challenge id syskey request request2 answer answer2 request-0
+      answer-0 cookie data) (proxy proxy-0 name))
+  (defstrand client 9 (challenge challenge) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 5 (challenge challenge) (id id) (secret request)
     (proxy proxy))
   (defstrand proxy 9 (challenge challenge) (id id) (secret request)
@@ -410,7 +1473,11 @@
       (recv (enc challenge (hash request challenge id))) (send request)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash request challenge id))))))
+          (enc cookie (hash syskey (hash request challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash request challenge id)))))
+      (recv answer2))
     ((recv challenge) (send id) (recv (enc request (pubk proxy)))
       (recv (enc id (hash request challenge id)))
       (send (enc challenge (hash request challenge id))))
@@ -422,25 +1489,25 @@
         (cat answer-0
           (enc cookie (hash syskey (hash request challenge id))))))
     ((tran request-0 (cat answer-0 cookie))))
-  (label 52)
+  (label 381)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge challenge) (secret request) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (challenge (0 0)) (request (0 2))))
 
 (defskeleton sbp
   (vars
-    (challenge id syskey request answer request-0 answer-0 cookie
-      challenge-0 id-0 secret request-1 data)
+    (challenge id syskey request request2 answer answer2 request-0
+      answer-0 cookie challenge-0 id-0 secret request-1 data)
     (proxy proxy-0 proxy-1 name))
-  (defstrand client 7 (challenge challenge) (id id) (secret request)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
+  (defstrand client 9 (challenge challenge) (id id) (secret request)
+    (request request) (request2 request2) (answer answer)
+    (answer2 answer2) (cookie cookie) (syskey syskey) (proxy proxy))
   (defstrand proxy 5 (challenge challenge) (id id) (secret request)
     (proxy proxy))
   (defstrand proxy 9 (challenge challenge) (id id) (secret request)
@@ -464,7 +1531,11 @@
       (recv (enc challenge (hash request challenge id))) (send request)
       (recv
         (cat answer
-          (enc cookie (hash syskey (hash request challenge id))))))
+          (enc cookie (hash syskey (hash request challenge id)))))
+      (send
+        (cat request2
+          (enc cookie (hash syskey (hash request challenge id)))))
+      (recv answer2))
     ((recv challenge) (send id) (recv (enc request (pubk proxy)))
       (recv (enc id (hash request challenge id)))
       (send (enc challenge (hash request challenge id))))
@@ -480,175 +1551,15 @@
       (recv (enc id-0 (hash secret challenge-0 id-0)))
       (send (enc challenge-0 (hash secret challenge-0 id-0)))
       (recv request-1) (init request-1)))
-  (label 53)
+  (label 382)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
       ((challenge challenge) (secret request) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
+        (proxy proxy) (request request) (request2 request2)
+        (answer answer) (answer2 answer2) (cookie cookie))))
   (origs (challenge (0 0)) (request (0 2))))
 
-(defskeleton sbp
-  (vars
-    (syskey request answer request-0 answer-0 cookie challenge id secret
-      request-1 data) (proxy name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
-  (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
-    (request request-0) (answer answer-0) (cookie cookie)
-    (syskey syskey) (proxy proxy))
-  (defstrand server 1 (request request-1) (answer answer-0)
-    (cookie cookie))
-  (defstrand proxy 7 (challenge challenge) (id id) (secret secret)
-    (request request-1) (proxy proxy))
-  (precedes ((0 0) (1 0)) ((0 0) (3 0)) ((0 2) (1 2)) ((0 2) (3 2))
-    ((0 3) (1 3)) ((0 3) (3 3)) ((1 8) (0 6)) ((2 0) (1 7))
-    ((3 4) (0 4)) ((3 6) (2 0)))
-  (leadsto ((2 0) (1 7)) ((3 6) (2 0)))
-  (non-orig syskey (privk proxy))
-  (pen-non-orig (pubk proxy))
-  (uniq-orig challenge secret)
-  (operation state-passing-test (displaced 1 4 proxy 7) request-1 (3 0))
-  (traces
-    ((send challenge) (recv id) (send (enc secret (pubk proxy)))
-      (send (enc id (hash secret challenge id)))
-      (recv (enc challenge (hash secret challenge id))) (send request)
-      (recv
-        (cat answer
-          (enc cookie (hash syskey (hash secret challenge id))))))
-    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id))) (recv request-0)
-      (init request-0) (obsv (cat answer-0 cookie))
-      (send
-        (cat answer-0
-          (enc cookie (hash syskey (hash secret challenge id))))))
-    ((tran request-1 (cat answer-0 cookie)))
-    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id))) (recv request-1)
-      (init request-1)))
-  (label 56)
-  (parent 0)
-  (unrealized)
-  (shape)
-  (maps
-    ((0)
-      ((challenge challenge) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
-  (origs (challenge (0 0)) (secret (0 2))))
-
-(defskeleton sbp
-  (vars
-    (challenge secret id syskey request answer request-0 answer-0 cookie
-      data) (proxy name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
-  (defstrand proxy 5 (challenge challenge) (id id) (secret secret)
-    (proxy proxy))
-  (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
-    (request request-0) (answer answer-0) (cookie cookie)
-    (syskey syskey) (proxy proxy))
-  (defstrand server 1 (request request-0) (answer answer-0)
-    (cookie cookie))
-  (precedes ((0 0) (1 0)) ((0 0) (2 0)) ((0 2) (1 2)) ((0 2) (2 2))
-    ((0 3) (1 3)) ((0 3) (2 3)) ((1 4) (0 4)) ((2 6) (3 0))
-    ((2 8) (0 6)) ((3 0) (2 7)))
-  (leadsto ((2 6) (3 0)) ((3 0) (2 7)))
-  (non-orig syskey (privk proxy))
-  (pen-non-orig (pubk proxy))
-  (uniq-orig challenge secret)
-  (operation state-passing-test (displaced 4 2 proxy 7) request-1 (3 0))
-  (traces
-    ((send challenge) (recv id) (send (enc secret (pubk proxy)))
-      (send (enc id (hash secret challenge id)))
-      (recv (enc challenge (hash secret challenge id))) (send request)
-      (recv
-        (cat answer
-          (enc cookie (hash syskey (hash secret challenge id))))))
-    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id))))
-    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id))) (recv request-0)
-      (init request-0) (obsv (cat answer-0 cookie))
-      (send
-        (cat answer-0
-          (enc cookie (hash syskey (hash secret challenge id))))))
-    ((tran request-0 (cat answer-0 cookie))))
-  (label 57)
-  (parent 0)
-  (unrealized)
-  (shape)
-  (maps
-    ((0)
-      ((challenge challenge) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
-  (origs (challenge (0 0)) (secret (0 2))))
-
-(defskeleton sbp
-  (vars
-    (challenge secret id syskey request answer request-0 answer-0 cookie
-      challenge-0 id-0 secret-0 request-1 data) (proxy proxy-0 name))
-  (defstrand client 7 (challenge challenge) (id id) (secret secret)
-    (request request) (answer answer) (cookie cookie) (syskey syskey)
-    (proxy proxy))
-  (defstrand proxy 5 (challenge challenge) (id id) (secret secret)
-    (proxy proxy))
-  (defstrand proxy 9 (challenge challenge) (id id) (secret secret)
-    (request request-0) (answer answer-0) (cookie cookie)
-    (syskey syskey) (proxy proxy))
-  (defstrand server 1 (request request-1) (answer answer-0)
-    (cookie cookie))
-  (defstrand proxy 7 (challenge challenge-0) (id id-0) (secret secret-0)
-    (request request-1) (proxy proxy-0))
-  (precedes ((0 0) (1 0)) ((0 0) (2 0)) ((0 2) (1 2)) ((0 2) (2 2))
-    ((0 3) (1 3)) ((0 3) (2 3)) ((1 4) (0 4)) ((2 8) (0 6))
-    ((3 0) (2 7)) ((4 6) (3 0)))
-  (leadsto ((3 0) (2 7)) ((4 6) (3 0)))
-  (non-orig syskey (privk proxy))
-  (pen-non-orig (pubk proxy))
-  (uniq-orig challenge secret)
-  (operation state-passing-test (added-strand proxy 7) request-1 (3 0))
-  (traces
-    ((send challenge) (recv id) (send (enc secret (pubk proxy)))
-      (send (enc id (hash secret challenge id)))
-      (recv (enc challenge (hash secret challenge id))) (send request)
-      (recv
-        (cat answer
-          (enc cookie (hash syskey (hash secret challenge id))))))
-    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id))))
-    ((recv challenge) (send id) (recv (enc secret (pubk proxy)))
-      (recv (enc id (hash secret challenge id)))
-      (send (enc challenge (hash secret challenge id))) (recv request-0)
-      (init request-0) (obsv (cat answer-0 cookie))
-      (send
-        (cat answer-0
-          (enc cookie (hash syskey (hash secret challenge id))))))
-    ((tran request-1 (cat answer-0 cookie)))
-    ((recv challenge-0) (send id-0) (recv (enc secret-0 (pubk proxy-0)))
-      (recv (enc id-0 (hash secret-0 challenge-0 id-0)))
-      (send (enc challenge-0 (hash secret-0 challenge-0 id-0)))
-      (recv request-1) (init request-1)))
-  (label 58)
-  (parent 0)
-  (unrealized)
-  (shape)
-  (maps
-    ((0)
-      ((challenge challenge) (secret secret) (id id) (syskey syskey)
-        (proxy proxy) (request request) (answer answer)
-        (cookie cookie))))
-  (origs (challenge (0 0)) (secret (0 2))))
-
-(comment "Nothing left to do")
+(comment "Step limit exceeded--aborting run")
