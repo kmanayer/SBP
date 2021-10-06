@@ -7,24 +7,24 @@
   (defrole client
     (vars (request request2 answer answer2 cookie syskey data) (client proxy name))
     (trace
-      (send (cat client request))
-      (recv (cat client answer (enc cookie (hash syskey (ltk client proxy)))))
-      (send (cat client request2 (enc cookie (hash syskey (ltk client proxy)))))
-      (recv (cat client answer2))
+      (send (cat request))
+      (recv (cat answer (enc cookie (hash syskey (ltk client proxy)))))
+      (send (cat request2 (enc cookie (hash syskey (ltk client proxy)))))
+      (recv (cat answer2))
     )
   )
   
   (defrole proxy
     (vars (request request2 answer answer2 cookie syskey data) (client proxy name))
     (trace
-      (recv (cat client request))
+      (recv (cat request))
       (init request)
       (obsv (cat answer cookie))
-      (send (cat client answer (enc cookie (hash syskey (ltk client proxy)))))
-      (recv (cat client request2 (enc cookie (hash syskey (ltk client proxy)))))
+      (send (cat answer (enc cookie (hash syskey (ltk client proxy)))))
+      (recv (cat request2 (enc cookie (hash syskey (ltk client proxy)))))
       (init (cat request2 cookie))
       (obsv answer2)
-      (send (cat client answer2))
+      (send (cat answer2))
     )
   )
   
