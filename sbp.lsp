@@ -5,24 +5,24 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (request request2 answer answer2 cookie syskey tlskey data) (client name))
+    (vars (request request2 answer answer2 cookie data) (client proxy name))
     (trace
       (init request)
-      (recv (cat answer (enc cookie (hash syskey tlskey))))
-      (send (cat request2 (enc cookie (hash syskey tlskey))))
-      (recv (cat answer2 (enc cookie (hash syskey tlskey))))
+      (recv (enc (cat "response1" answer cookie) (privk proxy)))
+      (send (enc (cat "request" request2 cookie) (privk client)))
+      (recv (enc (cat "response2" answer2 cookie) (privk proxy)))
     )
   )
   
   (defrole proxy
-    (vars (request request2 answer answer2 cookie syskey tlskey data))
+    (vars (request request2 answer answer2 cookie data) (client proxy name))
     (trace
       (obsv (cat answer cookie))
-      (send (cat answer (enc cookie (hash syskey tlskey))))
-      (recv (cat request2 (enc cookie (hash syskey tlskey))))
+      (send (enc (cat "response1" answer cookie) (privk proxy)))
+      (recv (enc (cat "request" request2 cookie) (privk client)))
       (init (cat request2 cookie))
       (obsv (cat answer2 cookie))
-      (send (cat answer2 (enc cookie (hash syskey tlskey))))
+      (send (enc (cat "response2" answer2 cookie) (privk proxy)))
     )
   )
   
@@ -38,14 +38,10 @@
 
 
 (defskeleton sbp
-  (vars (syskey request answer answer2 tlskey cookie data) )
-  (defstrandmax client (syskey syskey) (tlskey tlskey)  
-                       (answer answer) (answer2 answer2) (cookie cookie))
-  (non-orig cookie)           
-  (non-orig syskey)
-  (non-orig tlskey)
-  (non-orig answer)
-  (non-orig answer2)
+  (vars (client proxy name) )
+  (defstrandmax client (proxy proxy) (client client))
+  (non-orig (privk proxy) (privk client))
+  
 )
 
 ;;(defskeleton sbp
