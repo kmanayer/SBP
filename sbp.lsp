@@ -7,33 +7,35 @@
   (defrole client
     (vars (answer cookie tlskey data))
     (trace
-      (recv cookie)
-      (send (enc "request" cookie tlskey))
-      (recv (enc "response2" answer cookie tlskey))
+      ;; tls handshake and client authentication with proxy is out of scope
+      (recv cookie) ;; cookie is leaked
+      (send (enc "request" cookie tlskey)) ;; but no one can use the cookie except client instances
+      (recv (enc "response" answer cookie tlskey)) ;; only clients can trigger release of answer
     )
   )
   
-  (defrole proxy
+  (defrole proxy ;; encryption of cookie and communication with server are out of scope
     (vars (answer cookie tlskey data))
     (trace
       (send cookie)
       (recv (enc "request" cookie tlskey))
-      (send (enc "response2" answer cookie tlskey))
+      (send (enc "response" answer cookie tlskey))
     )
   )
-    )
+  
+)
 
 
 (defskeleton sbp
-  (vars (tlskey data))
-  (defstrandmax client (tlskey tlskey))
+  (vars (answer tlskey data))
+  (defstrandmax client (tlskey tlskey) (answer answer))
+  (deflistener answer)
   (pen-non-orig tlskey)
-  
 )
 
 ;;(defskeleton sbp
 ;;  (vars (syskey tlskey data) )
-;;  (defstrandmax client (syskey syskey) (tlskey tlskey) )
+;;  (defstrandmax client (syskey syskey) (tlskey tlskey))
 ;;  (non-orig syskey)
 ;;  (pen-non-orig tlskey)
 ;;)
