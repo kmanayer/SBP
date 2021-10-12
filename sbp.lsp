@@ -21,47 +21,15 @@
       (recv (enc "request" cookie tlskey))
       (send (enc "response" answer cookie tlskey))
     )
+    (uniq-gen answer)
   )
   
 )
 
-
+;; from the perspective of the client, with a listener for the answer
 (defskeleton sbp
   (vars (answer tlskey data))
   (defstrandmax client (tlskey tlskey) (answer answer))
   (deflistener answer)
   (pen-non-orig tlskey)
 )
-
-;;(defskeleton sbp
-;;  (vars (syskey tlskey data) )
-;;  (defstrandmax client (syskey syskey) (tlskey tlskey))
-;;  (non-orig syskey)
-;;  (pen-non-orig tlskey)
-;;)
-
-
-;; at most one proxy per client
-;;(defgoal sbp
-;;  (forall ((z0 z1 strd) (client proxy name))
-;;    (implies
-;;      (and (p "proxy" z0 1)
-;;           (p "proxy" z1 1)
-;;           (p "proxy" "client" z0 client)
-;;           (p "proxy" "client" z1 client)
-;;           (p "proxy" "proxy"  z0 proxy)
-;;           (p "proxy" "proxy"  z1 proxy)
-;;      )     
-;;      (= z0 z1)
-;;    )
-;;  )
-;;)
-         
-           
-;;(defskeleton sbp
-;;  (vars (syskey tlskey data) )
-;;  (defstrandmax client (syskey syskey) (tlskey tlskey) )
-;;  (non-orig syskey)
-;;  (pen-non-orig tlskey)
-;;)
-
