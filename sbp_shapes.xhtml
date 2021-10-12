@@ -20,38 +20,101 @@
 
 <div>
  <svg
-  class='diagram' width='129.840pt' height='79.920pt'
+  class='diagram' width='129.840pt' height='754.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 129.840 79.920' font-size='12.000'>
+  viewBox='0 0 129.840 754.920' font-size='12.000'>
+  <text
+   x='89.880' y='701.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k32&quot;, &quot;_self&quot;)'>32</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='714.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='626.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k27&quot;, &quot;_self&quot;)'>27</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='639.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='551.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k23&quot;, &quot;_self&quot;)'>23</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='564.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='476.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k22&quot;, &quot;_self&quot;)'>22</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='489.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='401.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k21&quot;, &quot;_self&quot;)'>21</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='414.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='326.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k20&quot;, &quot;_self&quot;)'>20</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='339.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='251.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k15&quot;, &quot;_self&quot;)'>15</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='176.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k14&quot;, &quot;_self&quot;)'>14</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='189.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='89.880' y='101.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k7&quot;, &quot;_self&quot;)'>7</text>
+  <line
+   x1='39.960' y1='377.460' x2='89.880' y2='114.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
   <text
    x='89.880' y='26.040'
    style='font-weight: bold; text-anchor: middle; fill: blue;'
-   onclick='window.open(&quot;#k1&quot;, &quot;_self&quot;)'>1</text>
+   onclick='window.open(&quot;#k4&quot;, &quot;_self&quot;)'>4</text>
   <line
-   x1='39.960' y1='39.960' x2='89.880' y2='39.960'
+   x1='39.960' y1='377.460' x2='89.880' y2='39.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <text
-   x='39.960' y='26.040' style='text-anchor: middle; fill: black;'
+   x='39.960' y='363.540' style='text-anchor: middle; fill: black;'
    onclick='window.open(&quot;#k0&quot;, &quot;_self&quot;)'>0</text>
   </svg></div>
 
 <pre>(defprotocol sbp basic
   (defrole client
-    (vars (request2 answer answer2 cookie data) (client proxy name))
-    (trace (recv (cat &quot;response1&quot; answer cookie client proxy))
-      (send (cat &quot;request&quot; request2 (enc cookie (privk client))))
+    (vars (answer2 cookie tlskey data) (proxy name))
+    (trace (recv (enc cookie tlskey))
+      (send (enc &quot;request&quot; cookie tlskey))
       (recv (enc &quot;response2&quot; answer2 cookie (privk proxy)))))
   (defrole proxy
-    (vars (request2 answer answer2 cookie data) (client proxy name))
-    (trace (send (cat &quot;response1&quot; answer cookie client proxy))
-      (recv (cat &quot;request&quot; request2 (enc cookie (privk client))))
+    (vars (answer2 cookie tlskey data) (proxy name))
+    (trace (send (enc cookie tlskey))
+      (recv (enc &quot;request&quot; cookie tlskey))
       (send (enc &quot;response2&quot; answer2 cookie (privk proxy)))))
   (defrole server
     (vars (request2 answer answer2 cookie data))
     (trace (init (cat answer cookie))
       (tran (cat request2 cookie) answer2))))</pre>
 
-<p id="k0">Item <a href="#t0">0</a>, Child: <a href="#k1">1</a>.</p>
+<p id="k0">Item <a href="#t0">0</a>, Children: <a href="#k4">4</a> <a href="#k7">7</a> <a href="#k14">14</a> <a href="#k15">15</a> <a href="#k20">20</a> <a href="#k21">21</a> <a href="#k22">22</a> <a href="#k23">23</a> <a href="#k27">27</a> <a href="#k32">32</a>.</p>
 
 <div>
  <svg
@@ -72,30 +135,112 @@
   <g>
    <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
    <circle style='fill: red;' cx='39.960' cy='264.960' r='6.000'/></g>
-  <g>
-   <title>(cat &quot;request&quot; request2 (enc cookie (privk client)))</title>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
    <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: red;' cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>(cat &quot;response1&quot; answer cookie client proxy)</title>
-   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
-  <g>
-   <title>((request2 request2) (answer answer) (answer2 answer2) (cookie cookie) (client client) (proxy proxy))</title>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
   <text x='39.960' y='39.960' style='text-anchor: middle;'>sbp 0</text>
   </svg></div>
 
 <pre>(defskeleton sbp
-  (vars (request2 answer answer2 cookie data) (client proxy name))
-  (defstrand client 3 (request2 request2) (answer answer)
-    (answer2 answer2) (cookie cookie) (client client) (proxy proxy))
-  (non-orig (privk client) (privk proxy))
+  (vars (tlskey answer2 cookie data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
   (label 0)
-  (unrealized (0 2))
+  (unrealized (0 0) (0 2))
   (origs)
-  (comment &quot;1 in cohort - 1 not yet seen&quot;))</pre>
+  (comment &quot;2 in cohort - 2 not yet seen&quot;))</pre>
 
-<p id="k1">Item <a href="#t0">1</a>, Parent: <a href="#k0">0</a>.</p>
+<p id="k4">Item <a href="#t0">4</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='279.840pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 279.840 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='114.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 239.880 264.960 Q 142.920 227.460 45.960 264.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='239.880' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey-0)</title>
+   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey-0)</title>
+   <circle cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey-0) (proxy proxy))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g><title>((cookie cookie) (tlskey tlskey))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='139.920' y='39.960'
+   style='text-anchor: middle;'>sbp 4 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (tlskey answer2 cookie tlskey-0 data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 1 (cookie cookie) (tlskey tlskey))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey-0)
+    (proxy proxy))
+  (precedes ((1 0) (0 0)) ((2 2) (0 2)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation encryption-test (added-strand proxy 3)
+    (enc &quot;response2&quot; answer2 cookie (privk proxy)) (0 2))
+  (label 4)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k7">Item <a href="#t0">7</a>, Parent: <a href="#k0">0</a>.</p>
 
 <div>
  <svg
@@ -122,52 +267,739 @@
   <g>
    <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
    <circle cx='139.920' cy='264.960' r='6.000'/></g>
-  <g>
-   <title>(cat &quot;request&quot; request2-0 (enc cookie (privk client-0)))</title>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
    <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
-  <g>
-   <title>(cat &quot;response1&quot; answer-0 cookie client-0 proxy)</title>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
    <circle cx='139.920' cy='114.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
    <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
-  <g>
-   <title>(cat &quot;request&quot; request2 (enc cookie (privk client)))</title>
+  <path
+   d='M 39.960 189.960 Q 86.940 189.960 133.920 189.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
    <circle cx='39.960' cy='189.960' r='6.000'/></g>
-  <g>
-   <title>(cat &quot;response1&quot; answer cookie client proxy)</title>
+  <g><title>(enc cookie tlskey)</title>
    <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((request2 request2-0) (answer answer-0) (answer2 answer2) (cookie cookie) (client client-0) (proxy proxy))</title>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
-   <title>((request2 request2) (answer answer) (answer2 answer2) (cookie cookie) (client client) (proxy proxy))</title>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
   <text
    x='89.940' y='39.960'
-   style='text-anchor: middle;'>sbp 1 (realized)</text></svg></div>
+   style='text-anchor: middle;'>sbp 7 (realized)</text></svg></div>
 
 <pre>(defskeleton sbp
-  (vars (request2 answer answer2 cookie request2-0 answer-0 data)
-    (client proxy client-0 name))
-  (defstrand client 3 (request2 request2) (answer answer)
-    (answer2 answer2) (cookie cookie) (client client) (proxy proxy))
-  (defstrand proxy 3 (request2 request2-0) (answer answer-0)
-    (answer2 answer2) (cookie cookie) (client client-0) (proxy proxy))
-  (precedes ((1 2) (0 2)))
-  (non-orig (privk client) (privk proxy))
-  (operation encryption-test (added-strand proxy 3)
-    (enc &quot;response2&quot; answer2 cookie (privk proxy)) (0 2))
-  (label 1)
+  (vars (answer2 cookie tlskey data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (precedes ((0 1) (1 1)) ((1 0) (0 0)) ((1 2) (0 2)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation encryption-test (displaced 2 0 client 2)
+    (enc &quot;request&quot; cookie tlskey) (1 1))
+  (label 7)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
-      ((client client) (proxy proxy) (request2 request2) (answer answer)
-        (answer2 answer2) (cookie cookie))))
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k14">Item <a href="#t0">14</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='279.840pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 279.840 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='189.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 239.880 189.960 Q 192.900 189.960 145.920 189.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='239.880' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <path
+   d='M 139.920 114.960 Q 186.900 114.960 233.880 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g><title>((cookie cookie) (tlskey tlskey))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>client</text>
+   </g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='139.920' y='39.960'
+   style='text-anchor: middle;'>sbp 14 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (answer2 cookie tlskey data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand client 2 (cookie cookie) (tlskey tlskey))
+  (precedes ((1 0) (0 0)) ((1 0) (2 0)) ((1 2) (0 2)) ((2 1) (1 1)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation encryption-test (displaced 3 1 proxy 1) (enc cookie tlskey)
+    (2 0))
+  (label 14)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k15">Item <a href="#t0">15</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='379.800pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 379.800 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='339.840' y1='114.960' x2='339.840' y2='114.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='189.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 339.840 114.960 Q 292.860 114.960 245.880 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='339.840' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 239.880 189.960 Q 192.900 189.960 145.920 189.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='239.880' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g><title>((cookie cookie) (tlskey tlskey))</title>
+   <text
+    x='339.840' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g><title>((cookie cookie) (tlskey tlskey))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>client</text>
+   </g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='189.900' y='39.960'
+   style='text-anchor: middle;'>sbp 15 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (answer2 cookie tlskey data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand client 2 (cookie cookie) (tlskey tlskey))
+  (defstrand proxy 1 (cookie cookie) (tlskey tlskey))
+  (precedes ((1 0) (0 0)) ((1 2) (0 2)) ((2 1) (1 1)) ((3 0) (2 0)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation encryption-test (added-strand proxy 1) (enc cookie tlskey)
+    (2 0))
+  (label 15)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k20">Item <a href="#t0">20</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='179.880pt' height='454.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 179.880 454.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='264.960' x2='39.960' y2='414.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; tlskey cookie (privk proxy))</title>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey-0)</title>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey-0)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; tlskey cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='339.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g>
+   <title>((answer2 tlskey) (cookie cookie) (tlskey tlskey-0) (proxy proxy))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 tlskey) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='89.940' y='39.960'
+   style='text-anchor: middle;'>sbp 20 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (tlskey cookie tlskey-0 data) (proxy name))
+  (defstrand client 3 (answer2 tlskey) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 tlskey) (cookie cookie) (tlskey tlskey-0)
+    (proxy proxy))
+  (precedes ((1 2) (0 0)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation generalization deleted (1 0))
+  (label 20)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 tlskey) (cookie cookie))))
+  (origs))</pre>
+
+<p id="k21">Item <a href="#t0">21</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='279.840pt' height='454.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 279.840 454.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='264.960' x2='39.960' y2='414.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 239.880 264.960 Q 142.320 300.660 44.759 411.359'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='239.880' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey-1)</title>
+   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey-1)</title>
+   <circle cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; tlskey cookie-0 (privk proxy-0))</title>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie-0 tlskey-0)</title>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie-0 tlskey-0)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='339.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey-1) (proxy proxy))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 tlskey) (cookie cookie-0) (tlskey tlskey-0) (proxy proxy-0))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='139.920' y='39.960'
+   style='text-anchor: middle;'>sbp 21 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (tlskey answer2 cookie cookie-0 tlskey-0 tlskey-1 data)
+    (proxy proxy-0 name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 tlskey) (cookie cookie-0)
+    (tlskey tlskey-0) (proxy proxy-0))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey-1)
+    (proxy proxy))
+  (precedes ((1 2) (0 0)) ((2 2) (0 2)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation generalization deleted (1 0))
+  (label 21)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k22">Item <a href="#t0">22</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='179.880pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 179.880 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie cookie)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie cookie)</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey cookie) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='89.940' y='39.960'
+   style='text-anchor: middle;'>sbp 22 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (answer2 cookie tlskey data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey cookie)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (precedes ((1 0) (0 0)) ((1 2) (0 2)))
+  (non-orig (privk proxy))
+  (pen-non-orig cookie)
+  (operation generalization deleted (1 0))
+  (label 22)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey cookie) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k23">Item <a href="#t0">23</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='279.840pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 279.840 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='114.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 239.880 264.960 Q 142.920 227.460 45.960 264.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='239.880' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey-1)</title>
+   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey-1)</title>
+   <circle cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc tlskey tlskey-0)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey-1) (proxy proxy))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g><title>((cookie tlskey) (tlskey tlskey-0))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='139.920' y='39.960'
+   style='text-anchor: middle;'>sbp 23 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (tlskey answer2 cookie tlskey-0 tlskey-1 data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 1 (cookie tlskey) (tlskey tlskey-0))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey-1)
+    (proxy proxy))
+  (precedes ((1 0) (0 0)) ((2 2) (0 2)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation generalization deleted (1 0))
+  (label 23)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k27">Item <a href="#t0">27</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='279.840pt' height='379.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 279.840 379.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='189.960' x2='139.920' y2='339.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='189.960' x2='39.960' y2='339.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 239.880 264.960 Q 192.900 264.960 145.920 264.960'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; tlskey cookie-0 (privk proxy-0))</title>
+   <circle cx='239.880' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie-0 tlskey-0)</title>
+   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie-0 tlskey-0)</title>
+   <circle cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 339.960 Q 92.940 339.960 45.960 339.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='139.920' cy='339.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
+  <path
+   d='M 139.920 189.960 Q 92.940 189.960 45.960 189.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='139.920' cy='189.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='339.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='189.960' r='6.000'/></g>
+  <g>
+   <title>((answer2 tlskey) (cookie cookie-0) (tlskey tlskey-0) (proxy proxy-0))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='139.920' y='39.960'
+   style='text-anchor: middle;'>sbp 27 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (answer2 cookie tlskey cookie-0 tlskey-0 data)
+    (proxy proxy-0 name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 tlskey) (cookie cookie-0)
+    (tlskey tlskey-0) (proxy proxy-0))
+  (precedes ((1 0) (0 0)) ((1 2) (0 2)) ((2 2) (1 1)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation generalization deleted (2 0))
+  (label 27)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
+  (origs))</pre>
+
+<p id="k32">Item <a href="#t0">32</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='279.840pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 279.840 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='239.880' y1='114.960' x2='239.880' y2='114.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 239.880 114.960 Q 192.300 150.660 144.719 186.359'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc tlskey tlskey-0)</title>
+   <circle cx='239.880' cy='114.960' r='6.000'/></g>
+  <path
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
+  <path
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
+   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g><title>(enc cookie tlskey)</title>
+   <circle cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
+   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>(enc cookie tlskey)</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g><title>((cookie tlskey) (tlskey tlskey-0))</title>
+   <text
+    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((answer2 answer2) (cookie cookie) (tlskey tlskey) (proxy proxy))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='139.920' y='39.960'
+   style='text-anchor: middle;'>sbp 32 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (answer2 cookie tlskey tlskey-0 data) (proxy name))
+  (defstrand client 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 3 (answer2 answer2) (cookie cookie) (tlskey tlskey)
+    (proxy proxy))
+  (defstrand proxy 1 (cookie tlskey) (tlskey tlskey-0))
+  (precedes ((1 0) (0 0)) ((1 2) (0 2)) ((2 0) (1 1)))
+  (non-orig (privk proxy))
+  (pen-non-orig tlskey)
+  (operation generalization deleted (2 0))
+  (label 32)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((proxy proxy) (tlskey tlskey) (answer2 answer2)
+        (cookie cookie))))
   (origs))</pre>
 
 </body>

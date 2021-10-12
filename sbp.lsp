@@ -5,19 +5,19 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (request request2 answer answer2 cookie data) (client proxy name))
+    (vars (request request2 answer answer2 cookie tlskey data) (client proxy name))
     (trace
-      (recv (cat "response1" answer cookie client proxy))
-      (send (cat "request" request2 (enc cookie (privk client))))
+      (recv cookie)
+      (send (enc "request" cookie tlskey))
       (recv (enc (cat "response2" answer2 cookie) (privk proxy)))
     )
   )
   
   (defrole proxy
-    (vars (request request2 answer answer2 cookie data) (client proxy name))
+    (vars (request request2 answer answer2 cookie tlskey data) (client proxy name))
     (trace
-      (send (cat "response1" answer cookie client proxy))
-      (recv (cat "request" request2 (enc cookie (privk client))))
+      (send cookie)
+      (recv(enc "request" cookie tlskey))
       (send (enc (cat "response2" answer2 cookie) (privk proxy)))
     )
   )
@@ -34,9 +34,10 @@
 
 
 (defskeleton sbp
-  (vars (client proxy name) )
-  (defstrandmax client (proxy proxy) (client client))
+  (vars (client proxy name) (tlskey data) )
+  (defstrandmax client (proxy proxy) (client client) (tlskey tlskey))
   (non-orig (privk proxy) (privk client))
+  (pen-non-orig tlskey)
   
 )
 
