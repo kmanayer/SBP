@@ -7,9 +7,8 @@
   (defrole client
     (vars (request request2 answer answer2 cookie data) (client proxy name))
     (trace
-      (init request)
-      (recv (enc (cat "response1" answer cookie) (privk proxy)))
-      (send (enc (cat "request" request2 cookie) (privk client)))
+      (recv (cat "response1" answer cookie client))
+      (send (cat "request" request2 (enc cookie (privk client))))
       (recv (enc (cat "response2" answer2 cookie) (privk proxy)))
     )
   )
@@ -17,11 +16,8 @@
   (defrole proxy
     (vars (request request2 answer answer2 cookie data) (client proxy name))
     (trace
-      (obsv (cat answer cookie))
-      (send (enc (cat "response1" answer cookie) (privk proxy)))
-      (recv (enc (cat "request" request2 cookie) (privk client)))
-      (init (cat request2 cookie))
-      (obsv (cat answer2 cookie))
+      (send (cat "response1" answer cookie client))
+      (recv (cat "request" request2 (enc cookie (privk client))))
       (send (enc (cat "response2" answer2 cookie) (privk proxy)))
     )
   )
@@ -29,7 +25,7 @@
   (defrole server
     (vars (request request2 answer answer2 cookie data) )
     (trace 
-      (tran request (cat answer cookie))
+      (init (cat answer cookie))
       (tran (cat request2 cookie) answer2)
     )
   )
