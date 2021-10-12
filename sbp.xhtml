@@ -36,12 +36,12 @@
 <pre>(defprotocol sbp basic
   (defrole client
     (vars (request2 answer answer2 cookie data) (client proxy name))
-    (trace (recv (cat &quot;response1&quot; answer cookie client))
+    (trace (recv (cat &quot;response1&quot; answer cookie client proxy))
       (send (cat &quot;request&quot; request2 (enc cookie (privk client))))
       (recv (enc &quot;response2&quot; answer2 cookie (privk proxy)))))
   (defrole proxy
     (vars (request2 answer answer2 cookie data) (client proxy name))
-    (trace (send (cat &quot;response1&quot; answer cookie client))
+    (trace (send (cat &quot;response1&quot; answer cookie client proxy))
       (recv (cat &quot;request&quot; request2 (enc cookie (privk client))))
       (send (enc &quot;response2&quot; answer2 cookie (privk proxy)))))
   (defrole server
@@ -73,7 +73,8 @@
   <g>
    <title>(cat &quot;request&quot; request2 (enc cookie (privk client)))</title>
    <circle cx='39.960' cy='189.960' r='6.000'/></g>
-  <g><title>(cat &quot;response1&quot; answer cookie client)</title>
+  <g>
+   <title>(cat &quot;response1&quot; answer cookie client proxy)</title>
    <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
    <title>((request2 request2) (answer answer) (answer2 answer2) (cookie cookie) (client client) (proxy proxy))</title>
@@ -122,7 +123,8 @@
   <g>
    <title>(cat &quot;request&quot; request2-0 (enc cookie (privk client-0)))</title>
    <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
-  <g><title>(cat &quot;response1&quot; answer-0 cookie client-0)</title>
+  <g>
+   <title>(cat &quot;response1&quot; answer-0 cookie client-0 proxy)</title>
    <circle cx='139.920' cy='114.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;response2&quot; answer2 cookie (privk proxy))</title>
@@ -130,7 +132,8 @@
   <g>
    <title>(cat &quot;request&quot; request2 (enc cookie (privk client)))</title>
    <circle cx='39.960' cy='189.960' r='6.000'/></g>
-  <g><title>(cat &quot;response1&quot; answer cookie client)</title>
+  <g>
+   <title>(cat &quot;response1&quot; answer cookie client proxy)</title>
    <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
    <title>((request2 request2-0) (answer answer-0) (answer2 answer2) (cookie cookie) (client client-0) (proxy proxy))</title>

@@ -10,12 +10,12 @@
 (defprotocol sbp basic
   (defrole client
     (vars (request2 answer answer2 cookie data) (client proxy name))
-    (trace (recv (cat "response1" answer cookie client))
+    (trace (recv (cat "response1" answer cookie client proxy))
       (send (cat "request" request2 (enc cookie (privk client))))
       (recv (enc "response2" answer2 cookie (privk proxy)))))
   (defrole proxy
     (vars (request2 answer answer2 cookie data) (client proxy name))
-    (trace (send (cat "response1" answer cookie client))
+    (trace (send (cat "response1" answer cookie client proxy))
       (recv (cat "request" request2 (enc cookie (privk client))))
       (send (enc "response2" answer2 cookie (privk proxy)))))
   (defrole server
@@ -29,7 +29,7 @@
     (answer2 answer2) (cookie cookie) (client client) (proxy proxy))
   (non-orig (privk client) (privk proxy))
   (traces
-    ((recv (cat "response1" answer cookie client))
+    ((recv (cat "response1" answer cookie client proxy))
       (send (cat "request" request2 (enc cookie (privk client))))
       (recv (enc "response2" answer2 cookie (privk proxy)))))
   (label 0)
@@ -49,10 +49,10 @@
   (operation encryption-test (added-strand proxy 3)
     (enc "response2" answer2 cookie (privk proxy)) (0 2))
   (traces
-    ((recv (cat "response1" answer cookie client))
+    ((recv (cat "response1" answer cookie client proxy))
       (send (cat "request" request2 (enc cookie (privk client))))
       (recv (enc "response2" answer2 cookie (privk proxy))))
-    ((send (cat "response1" answer-0 cookie client-0))
+    ((send (cat "response1" answer-0 cookie client-0 proxy))
       (recv (cat "request" request2-0 (enc cookie (privk client-0))))
       (send (enc "response2" answer2 cookie (privk proxy)))))
   (label 1)
