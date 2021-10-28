@@ -21,7 +21,7 @@
       (recv (enc "request" cookie tlskey))
       (send (enc "response" answer cookie tlskey))
     )
-    (uniq-gen answer)
+    (uniq-gen answer cookie) ;; so network has to try to figure it out each time
   )
   
 )
