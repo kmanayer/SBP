@@ -20,16 +20,9 @@
 
 <div>
  <svg
-  class='diagram' width='129.840pt' height='79.920pt'
+  class='diagram' width='79.920pt' height='79.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 129.840 79.920' font-size='12.000'>
-  <text
-   x='89.880' y='26.040'
-   style='font-weight: bold; text-anchor: middle; fill: blue;'
-   onclick='window.open(&quot;#k14&quot;, &quot;_self&quot;)'>14</text>
-  <line
-   x1='39.960' y1='39.960' x2='89.880' y2='39.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
+  viewBox='0 0 79.920 79.920' font-size='12.000'>
   <text
    x='39.960' y='26.040' style='text-anchor: middle; fill: black;'
    onclick='window.open(&quot;#k0&quot;, &quot;_self&quot;)'>0</text>
@@ -46,7 +39,7 @@
       (send (enc &quot;response&quot; answer cookie tlskey)))
     (uniq-gen answer cookie)))</pre>
 
-<p id="k0">Item <a href="#t0">0</a>, Child: <a href="#k14">14</a>.</p>
+<p id="k0">Item <a href="#t0">0</a>.</p>
 
 <div>
  <svg
@@ -88,87 +81,11 @@
   (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
   (deflistener answer)
   (pen-non-orig tlskey)
+  (uniq-gen tlskey)
   (label 0)
   (unrealized (0 2))
   (origs)
   (comment &quot;2 in cohort - 2 not yet seen&quot;))</pre>
-
-<p id="k14">Item <a href="#t0">14</a>, Parent: <a href="#k0">0</a>.</p>
-
-<div>
- <svg
-  class='diagram' width='279.840pt' height='379.920pt'
-  xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 279.840 379.920' font-size='12.000'>
-  <defs>
-   <marker
-    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
-    refY='5'>
-    <path
-     d='M 0 0 5 5 0 10'
-     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
-   </defs>
-  <line
-   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='139.920' y1='264.960' x2='139.920' y2='339.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <path
-   d='M 239.880 264.960 Q 142.920 227.460 45.960 264.960'
-   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <path
-   d='M 239.880 264.960 Q 192.900 264.960 145.920 264.960'
-   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc &quot;response&quot; answer cookie-0 cookie)</title>
-   <circle cx='239.880' cy='264.960' r='6.000'/></g>
-  <g><title>(enc &quot;request&quot; cookie-0 cookie)</title>
-   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
-  <path
-   d='M 239.880 114.960 Q 142.920 77.460 45.960 114.960'
-   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>cookie-0</title>
-   <circle cx='239.880' cy='114.960' r='6.000'/></g>
-  <g><title>answer</title><circle cx='139.920' cy='339.960' r='6.000'/>
-   </g>
-  <g><title>answer</title>
-   <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
-  <g><title>(enc &quot;response&quot; answer cookie-0 cookie-0)</title>
-   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
-  <g><title>(enc &quot;request&quot; cookie-0 cookie-0)</title>
-   <circle cx='39.960' cy='189.960' r='6.000'/></g>
-  <g><title>cookie-0</title>
-   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
-  <g><title>((answer answer) (cookie cookie-0) (tlskey cookie))</title>
-   <text
-    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
-  <g>
-   <title>((answer answer) (cookie cookie-0) (tlskey cookie-0))</title>
-   <text
-    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
-  <text
-   x='139.920' y='39.960'
-   style='text-anchor: middle;'>sbp 14 (realized)</text></svg></div>
-
-<pre>(defskeleton sbp
-  (vars (answer cookie cookie-0 data))
-  (defstrand client 3 (answer answer) (cookie cookie-0)
-    (tlskey cookie-0))
-  (deflistener answer)
-  (defstrand proxy 3 (answer answer) (cookie cookie-0) (tlskey cookie))
-  (precedes ((2 0) (0 0)) ((2 2) (0 2)) ((2 2) (1 0)))
-  (pen-non-orig cookie-0)
-  (uniq-gen answer cookie-0)
-  (operation generalization separated cookie-0)
-  (label 14)
-  (parent 0)
-  (unrealized)
-  (shape)
-  (maps ((0 1) ((answer answer) (tlskey cookie-0) (cookie cookie-0))))
-  (origs))</pre>
 
 </body>
 </html>
