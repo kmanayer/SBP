@@ -21,16 +21,35 @@
 (defskeleton sbp
   (vars (answer tlskey cookie data))
   (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (deflistener answer)
   (pen-non-orig tlskey)
   (uniq-gen tlskey)
   (traces
     ((recv cookie) (send (enc "request" cookie tlskey))
-      (recv (enc "response" answer cookie tlskey)))
-    ((recv answer) (send answer)))
+      (recv (enc "response" answer cookie tlskey))))
   (label 0)
   (unrealized (0 2))
   (origs)
   (comment "2 in cohort - 2 not yet seen"))
+
+(defskeleton sbp
+  (vars (answer tlskey cookie data))
+  (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
+  (defstrand proxy 3 (answer answer) (cookie cookie) (tlskey tlskey))
+  (precedes ((0 1) (1 1)) ((1 0) (0 0)) ((1 2) (0 2)))
+  (pen-non-orig tlskey)
+  (uniq-gen answer tlskey cookie)
+  (operation encryption-test (added-strand proxy 3)
+    (enc "response" answer cookie tlskey) (0 2))
+  (traces
+    ((recv cookie) (send (enc "request" cookie tlskey))
+      (recv (enc "response" answer cookie tlskey)))
+    ((send cookie) (recv (enc "request" cookie tlskey))
+      (send (enc "response" answer cookie tlskey))))
+  (label 1)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps ((0) ((answer answer) (tlskey tlskey) (cookie cookie))))
+  (origs))
 
 (comment "Nothing left to do")

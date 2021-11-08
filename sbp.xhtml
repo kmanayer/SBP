@@ -18,9 +18,9 @@
 
 <div>
  <svg
-  class='diagram' width='179.760pt' height='154.920pt'
+  class='diagram' width='129.840pt' height='154.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 179.760 154.920' font-size='12.000'>
+  viewBox='0 0 129.840 154.920' font-size='12.000'>
   <text
    x='89.880' y='101.040' style='text-anchor: middle; fill: red;'
    onclick='window.open(&quot;#k2&quot;, &quot;_self&quot;)'>2</text>
@@ -28,19 +28,14 @@
    x1='39.960' y1='77.460' x2='89.880' y2='114.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <text
-   x='139.800' y='26.040' style='text-anchor: middle; fill: red;'
-   onclick='window.open(&quot;#k3&quot;, &quot;_self&quot;)'>3</text>
-  <line
-   x1='89.880' y1='39.960' x2='139.800' y2='39.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <text
-   x='89.880' y='26.040' style='text-anchor: middle; fill: red;'
+   x='89.880' y='26.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
    onclick='window.open(&quot;#k1&quot;, &quot;_self&quot;)'>1</text>
   <line
    x1='39.960' y1='77.460' x2='89.880' y2='39.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <text
-   x='39.960' y='63.540' style='text-anchor: middle; fill: red;'
+   x='39.960' y='63.540' style='text-anchor: middle; fill: black;'
    onclick='window.open(&quot;#k0&quot;, &quot;_self&quot;)'>0</text>
   </svg></div>
 
@@ -59,6 +54,46 @@
 
 <div>
  <svg
+  class='diagram' width='79.920pt' height='304.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 79.920 304.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
+   <circle style='fill: red;' cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
+   <circle cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>cookie</title>
+   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
+  <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text x='39.960' y='39.960' style='text-anchor: middle;'>sbp 0</text>
+  </svg></div>
+
+<pre>(defskeleton sbp
+  (vars (answer tlskey cookie data))
+  (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
+  (pen-non-orig tlskey)
+  (uniq-gen tlskey)
+  (label 0)
+  (unrealized (0 2))
+  (origs)
+  (comment &quot;2 in cohort - 2 not yet seen&quot;))</pre>
+
+<p id="k1">Item <a href="#t0">1</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
   class='diagram' width='179.880pt' height='304.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
   viewBox='0 0 179.880 304.920' font-size='12.000'>
@@ -71,85 +106,27 @@
      style='stroke-width: 2; fill: none; stroke: black;'/></marker>
    </defs>
   <line
-   x1='139.920' y1='114.960' x2='139.920' y2='189.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <g><title>answer</title><circle cx='139.920' cy='189.960' r='6.000'/>
-   </g>
-  <g><title>answer</title>
-   <circle style='fill: blue;' cx='139.920' cy='114.960' r='6.000'/></g>
-  <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
-   <circle style='fill: red;' cx='39.960' cy='264.960' r='6.000'/></g>
-  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
-   <circle cx='39.960' cy='189.960' r='6.000'/></g>
-  <g><title>cookie</title>
-   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
-  <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
-   <text
-    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
-  <text x='89.940' y='39.960' style='text-anchor: middle;'>sbp 0</text>
-  </svg></div>
-
-<pre>(defskeleton sbp
-  (vars (answer tlskey cookie data))
-  (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (deflistener answer)
-  (pen-non-orig tlskey)
-  (uniq-gen tlskey)
-  (label 0)
-  (unrealized (0 2))
-  (origs)
-  (comment &quot;2 in cohort - 2 not yet seen&quot;))</pre>
-
-<p id="k1">Item <a href="#t0">1</a>, Parent: <a href="#k0">0</a>, Child: <a href="#k3">3</a>.</p>
-
-<div>
- <svg
-  class='diagram' width='279.840pt' height='379.920pt'
-  xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 279.840 379.920' font-size='12.000'>
-  <defs>
-   <marker
-    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
-    refY='5'>
-    <path
-     d='M 0 0 5 5 0 10'
-     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
-   </defs>
-  <line
-   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='139.920' y1='264.960' x2='139.920' y2='339.960'
+   x1='139.920' y1='114.960' x2='139.920' y2='264.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <line
    x1='39.960' y1='114.960' x2='39.960' y2='264.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <path
-   d='M 239.880 264.960 Q 142.920 227.460 45.960 264.960'
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <path
-   d='M 239.880 264.960 Q 192.900 264.960 145.920 264.960'
-   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
-   <circle cx='239.880' cy='264.960' r='6.000'/></g>
+   <circle cx='139.920' cy='264.960' r='6.000'/></g>
   <g><title>(enc &quot;request&quot; cookie tlskey)</title>
-   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
+   <circle style='fill: blue;' cx='139.920' cy='189.960' r='6.000'/></g>
   <path
-   d='M 239.880 114.960 Q 142.920 77.460 45.960 114.960'
+   d='M 139.920 114.960 Q 92.940 114.960 45.960 114.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>cookie</title><circle cx='239.880' cy='114.960' r='6.000'/>
+  <g><title>cookie</title><circle cx='139.920' cy='114.960' r='6.000'/>
    </g>
-  <g><title>answer</title><circle cx='139.920' cy='339.960' r='6.000'/>
-   </g>
-  <g><title>answer</title>
-   <circle style='fill: red;' cx='139.920' cy='264.960' r='6.000'/></g>
   <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
    <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
   <path
-   d='M 39.960 189.960 Q 136.920 152.460 233.880 189.960'
+   d='M 39.960 189.960 Q 86.940 189.960 133.920 189.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g><title>(enc &quot;request&quot; cookie tlskey)</title>
    <circle cx='39.960' cy='189.960' r='6.000'/></g>
@@ -157,35 +134,37 @@
    <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
   <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
    <text
-    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
-  <text x='139.920' y='39.960' style='text-anchor: middle;'>sbp 1</text>
-  </svg></div>
+  <text
+   x='89.940' y='39.960'
+   style='text-anchor: middle;'>sbp 1 (realized)</text></svg></div>
 
 <pre>(defskeleton sbp
   (vars (answer tlskey cookie data))
   (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (deflistener answer)
   (defstrand proxy 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (precedes ((0 1) (2 1)) ((2 0) (0 0)) ((2 2) (0 2)) ((2 2) (1 0)))
+  (precedes ((0 1) (1 1)) ((1 0) (0 0)) ((1 2) (0 2)))
   (pen-non-orig tlskey)
   (uniq-gen answer tlskey cookie)
   (operation encryption-test (added-strand proxy 3)
     (enc &quot;response&quot; answer cookie tlskey) (0 2))
   (label 1)
   (parent 0)
-  (unrealized (1 0))
-  (comment &quot;1 in cohort - 1 not yet seen&quot;))</pre>
+  (unrealized)
+  (shape)
+  (maps ((0) ((answer answer) (tlskey tlskey) (cookie cookie))))
+  (origs))</pre>
 
 <p id="k2">Item <a href="#t0">2</a>, Parent: <a href="#k0">0</a>.</p>
 
 <div>
  <svg
-  class='diagram' width='279.840pt' height='304.920pt'
+  class='diagram' width='179.880pt' height='304.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 279.840 304.920' font-size='12.000'>
+  viewBox='0 0 179.880 304.920' font-size='12.000'>
   <defs>
    <marker
     id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
@@ -195,29 +174,22 @@
      style='stroke-width: 2; fill: none; stroke: black;'/></marker>
    </defs>
   <line
-   x1='239.880' y1='189.960' x2='239.880' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='139.920' y1='114.960' x2='139.920' y2='189.960'
+   x1='139.920' y1='189.960' x2='139.920' y2='264.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <line
    x1='39.960' y1='114.960' x2='39.960' y2='264.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <path
-   d='M 239.880 264.960 Q 142.920 227.460 45.960 264.960'
+   d='M 139.920 264.960 Q 92.940 264.960 45.960 264.960'
    style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>tlskey</title><circle cx='239.880' cy='264.960' r='6.000'/>
+  <g><title>tlskey</title><circle cx='139.920' cy='264.960' r='6.000'/>
    </g>
   <g><title>tlskey</title>
-   <circle style='fill: red;' cx='239.880' cy='189.960' r='6.000'/></g>
-  <g><title>answer</title><circle cx='139.920' cy='189.960' r='6.000'/>
-   </g>
-  <g><title>answer</title>
-   <circle style='fill: blue;' cx='139.920' cy='114.960' r='6.000'/></g>
+   <circle style='fill: red;' cx='139.920' cy='189.960' r='6.000'/></g>
   <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
    <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
   <path
-   d='M 39.960 189.960 Q 136.920 152.460 233.880 189.960'
+   d='M 39.960 189.960 Q 86.940 189.960 133.920 189.960'
    style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g><title>(enc &quot;request&quot; cookie tlskey)</title>
    <circle cx='39.960' cy='189.960' r='6.000'/></g>
@@ -226,114 +198,21 @@
   <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
-  <text x='139.920' y='39.960' style='text-anchor: middle;'>sbp 2</text>
+  <text x='89.940' y='39.960' style='text-anchor: middle;'>sbp 2</text>
   </svg></div>
 
 <pre>(defskeleton sbp
   (vars (answer tlskey cookie data))
   (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (deflistener answer)
   (deflistener tlskey)
-  (precedes ((0 1) (2 0)) ((2 1) (0 2)))
+  (precedes ((0 1) (1 0)) ((1 1) (0 2)))
   (pen-non-orig tlskey)
   (uniq-gen tlskey)
   (operation encryption-test (added-listener tlskey)
     (enc &quot;response&quot; answer cookie tlskey) (0 2))
   (label 2)
   (parent 0)
-  (unrealized (2 0))
-  (dead)
-  (comment &quot;empty cohort&quot;))</pre>
-
-<p id="k3">Item <a href="#t0">3</a>, Parent: <a href="#k1">1</a>.</p>
-
-<div>
- <svg
-  class='diagram' width='379.800pt' height='379.920pt'
-  xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 379.800 379.920' font-size='12.000'>
-  <defs>
-   <marker
-    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
-    refY='5'>
-    <path
-     d='M 0 0 5 5 0 10'
-     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
-   </defs>
-  <line
-   x1='339.840' y1='189.960' x2='339.840' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='239.880' y1='114.960' x2='239.880' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='139.920' y1='264.960' x2='139.920' y2='339.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='39.960' y1='114.960' x2='39.960' y2='264.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <path
-   d='M 339.840 264.960 Q 242.880 227.460 145.920 264.960'
-   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>tlskey</title><circle cx='339.840' cy='264.960' r='6.000'/>
-   </g>
-  <g><title>tlskey</title>
-   <circle style='fill: red;' cx='339.840' cy='189.960' r='6.000'/></g>
-  <path
-   d='M 239.880 264.960 Q 142.920 227.460 45.960 264.960'
-   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <path
-   d='M 239.880 264.960 Q 192.900 264.960 145.920 264.960'
-   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
-   <circle cx='239.880' cy='264.960' r='6.000'/></g>
-  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
-   <circle style='fill: blue;' cx='239.880' cy='189.960' r='6.000'/></g>
-  <path
-   d='M 239.880 114.960 Q 142.920 77.460 45.960 114.960'
-   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>cookie</title><circle cx='239.880' cy='114.960' r='6.000'/>
-   </g>
-  <g><title>answer</title><circle cx='139.920' cy='339.960' r='6.000'/>
-   </g>
-  <g><title>answer</title>
-   <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
-  <g><title>(enc &quot;response&quot; answer cookie tlskey)</title>
-   <circle style='fill: blue;' cx='39.960' cy='264.960' r='6.000'/></g>
-  <path
-   d='M 39.960 189.960 Q 136.920 152.460 233.880 189.960'
-   style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <path
-   d='M 39.960 189.960 Q 186.900 152.460 333.840 189.960'
-   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc &quot;request&quot; cookie tlskey)</title>
-   <circle cx='39.960' cy='189.960' r='6.000'/></g>
-  <g><title>cookie</title>
-   <circle style='fill: blue;' cx='39.960' cy='114.960' r='6.000'/></g>
-  <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
-   <text
-    x='239.880' y='77.460' style='text-anchor: middle;'>proxy</text></g>
-  <g><title>((answer answer) (cookie cookie) (tlskey tlskey))</title>
-   <text
-    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
-  <text x='189.900' y='39.960' style='text-anchor: middle;'>sbp 3</text>
-  </svg></div>
-
-<pre>(defskeleton sbp
-  (vars (answer tlskey cookie data))
-  (defstrand client 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (deflistener answer)
-  (defstrand proxy 3 (answer answer) (cookie cookie) (tlskey tlskey))
-  (deflistener tlskey)
-  (precedes ((0 1) (2 1)) ((0 1) (3 0)) ((2 0) (0 0)) ((2 2) (0 2))
-    ((2 2) (1 0)) ((3 1) (1 0)))
-  (pen-non-orig tlskey)
-  (uniq-gen answer tlskey cookie)
-  (operation nonce-test (added-listener tlskey) answer (1 0)
-    (enc &quot;response&quot; answer cookie tlskey))
-  (label 3)
-  (parent 1)
-  (unrealized (3 0))
+  (unrealized (1 0))
   (dead)
   (comment &quot;empty cohort&quot;))</pre>
 
