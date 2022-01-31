@@ -1,0 +1,50 @@
+(comment "CPSA 3.6.6")
+(comment "Extracted shapes")
+
+(herald "Session Binding Protocol (SBP)")
+
+(comment "CPSA 3.6.6")
+
+(comment "All input read from sbp.lsp")
+
+(defprotocol sbp basic
+  (defrole client
+    (vars (answer cookie tlskey sskey data))
+    (trace (recv (enc "response" (enc cookie sskey) tlskey))
+      (send (enc cookie sskey))
+      (send (enc "request" (enc cookie sskey) tlskey))
+      (recv (enc "sensitive" answer (enc cookie sskey) tlskey))))
+  (defrole proxy
+    (vars (answer cookie tlskey sskey data))
+    (trace (send (enc "response" (enc cookie sskey) tlskey))
+      (recv (enc "request" (enc cookie sskey) tlskey))
+      (send (enc "sensitive" answer (enc cookie sskey) tlskey)))
+    (non-orig sskey)
+    (uniq-gen answer cookie)))
+
+(defskeleton sbp
+  (vars (answer tlskey cookie sskey cookie-0 sskey-0 data))
+  (defstrand client 4 (answer answer) (cookie cookie) (tlskey tlskey)
+    (sskey sskey))
+  (defstrand proxy 3 (answer answer) (cookie cookie-0) (tlskey tlskey)
+    (sskey sskey-0))
+  (deflistener answer)
+  (non-orig sskey-0)
+  (pen-non-orig tlskey)
+  (uniq-gen answer cookie-0)
+  (traces
+    ((recv (enc "response" (enc cookie sskey) tlskey))
+      (send (enc cookie sskey))
+      (send (enc "request" (enc cookie sskey) tlskey))
+      (recv (enc "sensitive" answer (enc cookie sskey) tlskey)))
+    ((send (enc "response" (enc cookie-0 sskey-0) tlskey))
+      (recv (enc "request" (enc cookie-0 sskey-0) tlskey))
+      (send (enc "sensitive" answer (enc cookie-0 sskey-0) tlskey)))
+    ((recv answer) (send answer)))
+  (label 0)
+  (unrealized (0 0) (0 3) (1 1) (2 0))
+  (preskeleton)
+  (origs)
+  (comment "Not a skeleton"))
+
+(comment "Nothing left to do")

@@ -8,7 +8,7 @@
     (vars (answer cookie tlskey sskey data))
     (trace
       ;; tls handshake and client authentication with proxy is out of scope
-      
+  
       (recv (enc "response" (enc cookie sskey) tlskey)) ;; proxy is sharing cookie with client cuz client is nice
       (send (enc cookie sskey)) ;; client is dumb af and cookie is leaked
       (send (enc "request" (enc cookie sskey) tlskey)) ;; but to make this request, you need the tlskey,
@@ -35,11 +35,7 @@
 (defskeleton sbp
   (vars (answer tlskey data))
   (defstrandmax client (tlskey tlskey) (answer answer))
-<<<<<<< Updated upstream
-=======
-  (defstrandmax proxy (tlskey tlskey) (answer answer))
+  (defstrandmax proxy  (tlskey tlskey) (answer answer))
   (deflistener answer)
->>>>>>> Stashed changes
   (pen-non-orig tlskey)
-  (uniq-gen tlskey)
 )
