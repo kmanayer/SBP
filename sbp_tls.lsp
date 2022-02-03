@@ -7,32 +7,44 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (answer cookie sskey login_info data) (c p name) (enc_cookie mesg))
+    (vars (cc id s cred request answer data) (p name) (enc_cookie mesg))
     (trace
-      ;; tls handshake with proxy (line 0-10 in diagram) is out of scope
-      ;; assume both share a ltk that no other role can guess
-      ;; all further communiation passes through SSL connection
-      (send (ltk c p))
-      (send (enc "login-request" login_info  (ltk c p)))
-      (recv (enc "login-success" enc_cookie (ltk c p))) 
-      (send enc_cookie) ;; to simulate leaking cookie
-      ;;(send (enc "request" "malicious" enc_cookie (ltk c p))) ;; xss script sends this request
-      (send (enc "request" enc_cookie (ltk c p))) ;; 
-      (recv (enc "answer" answer enc_cookie (ltk c p))) ;; only clients can trigger release of answer
+
+      (send cc)
+      (recv id)
+      (send (enc s (pubk p)))
+      (send (enc id (hash s cc id)))
+      (recv (enc cc (hash s cc id)))
+
+      (send (enc "login-request"   cred                  (hash s cc id)))
+      (recv (enc "login-success"             enc_cookie  (hash s cc id))) 
+      (send (enc "request"        request    enc_cookie  (hash s cc id))) 
+      (recv (enc "answer"         answer                 (hash s cc id))) 
     )
-    
+    (uniq-gen cc)
+    (uniq-gen s)
+
   )
   
   (defrole proxy ;; encryption of cookie and communication with server are out of scope
-    (vars (answer cookie sskey login_info data) (c p name) )
+    (vars (cc id s cred cookie request answer sskey data) (p name))
     (trace
-      (recv (enc "login-request" login_info (ltk c p)))
-      (send (enc "login-success" (enc cookie (hash (ltk c p) sskey)) (ltk c p)))
-      (recv (enc "request" (enc cookie (hash (ltk c p) sskey)) (ltk c p))) ;; but to make this request, you need the tlskey,
-      (send (enc "answer" answer (enc cookie (hash (ltk c p) sskey)) (ltk c p))) ;; only clients can trigger release of answer
+      (recv cc)
+      (send id)
+      (recv (enc s (pubk p)))
+      (send (enc id (hash s cc id)))
+      (recv (enc cc (hash s cc id)))
+
+      (recv (enc "login-request" cred                                                  (hash s cc id)))
+      (send (enc "login-success"            (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (recv (enc "request"       request    (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (send (enc "answer"        answer     (enc cookie (hash sskey (hash s cc id)))   (hash s cc id))) 
     )
-    (uniq-gen answer);; so network has to try to figure it out each time
-    ;;(non-orig sskey);; kc = (hash (ltk c p) sskey)
+    (uniq-gen id)
+    (uniq-gen cookie)
+    (non-orig sskey)
+    (non-orig (privk p))
+    (uniq-orig answer)
   )
 
 )
@@ -42,12 +54,12 @@
 ;; from the perspective of the client, with a listener for the answer
 ;; it probably will need the proxy cuz proxy has the answer
 (defskeleton sbp
-  (vars (answer data) (c p name))
-  (defstrandmax client (answer answer) (c c) (p p))
+  (vars (answer data) (p name))
+  (defstrandmax client (answer answer) (p p))
   ;;(defstrandmax proxy  (answer answer) (c c) (p p))
   ;;(deflistener answer)
-  ;;(non-orig (ltk c p)) 
-  (uniq-gen (ltk c p)) ;; assume different for every client-proxy connection
+  (non-orig (privk p))
+  
 )
 
 
