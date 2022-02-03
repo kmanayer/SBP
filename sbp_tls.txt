@@ -1,0 +1,46 @@
+(herald "Session Binding Protocol (SBP)")
+
+(comment "CPSA 3.6.6")
+(comment "All input read from sbp_tls.lsp")
+
+(defprotocol sbp basic
+  (defrole client
+    (vars (answer login_info data) (c p name) (enc_cookie mesg))
+    (trace (send (ltk c p))
+      (send (enc "login-request" login_info (ltk c p)))
+      (recv (enc "login-success" enc_cookie (ltk c p)))
+      (send enc_cookie) (send (enc "request" enc_cookie (ltk c p)))
+      (recv (enc "answer" answer enc_cookie (ltk c p)))))
+  (defrole proxy
+    (vars (answer cookie sskey login_info data) (c p name))
+    (trace (recv (enc "login-request" login_info (ltk c p)))
+      (send
+        (enc "login-success" (enc cookie (hash (ltk c p) sskey))
+          (ltk c p)))
+      (recv
+        (enc "request" (enc cookie (hash (ltk c p) sskey)) (ltk c p)))
+      (send
+        (enc "answer" answer (enc cookie (hash (ltk c p) sskey))
+          (ltk c p))))
+    (uniq-gen answer)))
+
+(defskeleton sbp
+  (vars (enc_cookie mesg) (answer login_info data) (c p name))
+  (defstrand client 6 (enc_cookie enc_cookie) (answer answer)
+    (login_info login_info) (c c) (p p))
+  (uniq-gen (ltk c p))
+  (traces
+    ((send (ltk c p)) (send (enc "login-request" login_info (ltk c p)))
+      (recv (enc "login-success" enc_cookie (ltk c p)))
+      (send enc_cookie) (send (enc "request" enc_cookie (ltk c p)))
+      (recv (enc "answer" answer enc_cookie (ltk c p)))))
+  (label 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((answer answer) (c c) (p p) (login_info login_info)
+        (enc_cookie enc_cookie))))
+  (origs))
+
+(comment "Nothing left to do")
