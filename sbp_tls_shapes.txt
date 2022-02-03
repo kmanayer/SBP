@@ -9,8 +9,9 @@
 
 (defprotocol sbp basic
   (defrole client
-    (vars (cc id s cred request answer data) (p name) (enc_cookie mesg))
-    (trace (send cc) (recv id) (send (enc s (pubk p)))
+    (vars (cc id s cred request answer data) (pk akey)
+      (enc_cookie mesg))
+    (trace (send cc) (recv (cat id pk)) (send (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc "login-request" cred (hash s cc id)))
       (recv (enc "login-success" enc_cookie (hash s cc id)))
@@ -18,8 +19,8 @@
       (recv (enc "answer" answer (hash s cc id))))
     (uniq-gen cc s))
   (defrole proxy
-    (vars (cc id s cred cookie request answer sskey data) (p name))
-    (trace (recv cc) (send id) (recv (enc s (pubk p)))
+    (vars (cc id s cred cookie request answer sskey data) (pk akey))
+    (trace (recv cc) (send (cat id pk)) (recv (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (recv (enc "login-request" cred (hash s cc id)))
       (send
@@ -31,26 +32,31 @@
       (send
         (enc "answer" answer (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id))))
-    (non-orig sskey (privk p))
+    (non-orig sskey (invk pk))
     (uniq-orig answer)
     (uniq-gen id cookie)))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (answer cc id s cred request data) (p name))
+  (vars (enc_cookie mesg) (answer cc id s cred request data) (pk akey))
   (defstrand client 9 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
-    (cred cred) (request request) (answer answer) (p p))
-  (non-orig (privk p))
+    (cred cred) (request request) (answer answer) (pk pk))
+  (deflistener answer)
   (uniq-gen cc s)
   (traces
-    ((send cc) (recv id) (send (enc s (pubk p)))
+    ((send cc) (recv (cat id pk)) (send (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc "login-request" cred (hash s cc id)))
       (recv (enc "login-success" enc_cookie (hash s cc id)))
       (send (enc "request" request enc_cookie (hash s cc id)))
-      (recv (enc "answer" answer (hash s cc id)))))
+      (recv (enc "answer" answer (hash s cc id))))
+    ((recv answer) (send answer)))
   (label 0)
-  (unrealized (0 4) (0 6) (0 8))
-  (origs)
-  (comment "2 in cohort - 2 not yet seen"))
+  (unrealized)
+  (shape)
+  (maps
+    ((0 1)
+      ((answer answer) (cc cc) (id id) (s s) (cred cred)
+        (request request) (pk pk) (enc_cookie enc_cookie))))
+  (origs))
 
 (comment "Nothing left to do")

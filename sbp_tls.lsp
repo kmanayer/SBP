@@ -7,12 +7,12 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (cc id s cred request answer data) (p name) (enc_cookie mesg))
+    (vars (cc id s cred request answer data) (pk akey) (enc_cookie mesg))
     (trace
 
       (send cc)
-      (recv id)
-      (send (enc s (pubk p)))
+      (recv (cat id pk))
+      (send (enc s  pk))
       (send (enc id (hash s cc id)))
       (recv (enc cc (hash s cc id)))
 
@@ -27,11 +27,11 @@
   )
   
   (defrole proxy ;; encryption of cookie and communication with server are out of scope
-    (vars (cc id s cred cookie request answer sskey data) (p name))
+    (vars (cc id s cred cookie request answer sskey data) (pk akey))
     (trace
       (recv cc)
-      (send id)
-      (recv (enc s (pubk p)))
+      (send (cat id pk))
+      (recv (enc s  pk))
       (send (enc id (hash s cc id)))
       (recv (enc cc (hash s cc id)))
 
@@ -43,7 +43,7 @@
     (uniq-gen id)
     (uniq-gen cookie)
     (non-orig sskey)
-    (non-orig (privk p))
+    (non-orig (invk pk))
     (uniq-orig answer)
   )
 
@@ -54,12 +54,11 @@
 ;; from the perspective of the client, with a listener for the answer
 ;; it probably will need the proxy cuz proxy has the answer
 (defskeleton sbp
-  (vars (answer data) (p name))
-  (defstrandmax client (answer answer) (p p))
+  (vars (answer data))
+  (defstrandmax client (answer answer) )
   ;;(defstrandmax proxy  (answer answer) (c c) (p p))
-  ;;(deflistener answer)
-  (non-orig (privk p))
-  
+  (deflistener answer)
+  ;;(non-orig (privk p))
 )
 
 
