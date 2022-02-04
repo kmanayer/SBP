@@ -18,27 +18,33 @@
 
 <div>
  <svg
-  class='diagram' width='79.920pt' height='79.920pt'
+  class='diagram' width='129.840pt' height='79.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 79.920 79.920' font-size='12.000'>
+  viewBox='0 0 129.840 79.920' font-size='12.000'>
   <text
-   x='39.960' y='26.040' style='text-anchor: middle; fill: red;'
+   x='89.880' y='26.040'
+   style='font-weight: bold; text-anchor: middle; fill: blue;'
+   onclick='window.open(&quot;#k1&quot;, &quot;_self&quot;)'>1</text>
+  <line
+   x1='39.960' y1='39.960' x2='89.880' y2='39.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <text
+   x='39.960' y='26.040' style='text-anchor: middle; fill: black;'
    onclick='window.open(&quot;#k0&quot;, &quot;_self&quot;)'>0</text>
   </svg></div>
 
 <pre>(defprotocol sbp basic
   (defrole client
-    (vars (cc id s cred request answer data) (pk akey)
-      (enc_cookie mesg))
+    (vars (cc id s cred request data) (pk akey) (enc_cookie mesg)
+      (p name))
     (trace (send cc) (recv (cat id pk)) (send (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (init &quot;empty&quot;) (send (enc &quot;login-request&quot; cred (hash s cc id)))
+      (send (enc &quot;login-request&quot; cred (hash s cc id)))
       (recv (enc &quot;login-success&quot; enc_cookie (hash s cc id)))
       (send (enc &quot;request&quot; request enc_cookie (hash s cc id)))
-      (obsv answer))
-    (uniq-gen cc s))
+      (recv (enc (enc &quot;answer&quot; (privk p)) enc_cookie (hash s cc id)))))
   (defrole proxy
-    (vars (cc id s cred cookie request answer sskey data) (pk akey))
+    (vars (cc id s cred cookie request sskey data) (pk akey) (p name))
     (trace (recv cc) (send (cat id pk)) (recv (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (recv (enc &quot;login-request&quot; cred (hash s cc id)))
@@ -47,17 +53,18 @@
           (hash s cc id)))
       (recv
         (enc &quot;request&quot; request (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id))) (tran &quot;empty&quot; answer))
-    (non-orig sskey (invk pk) answer)
-    (uniq-gen id cookie answer)))</pre>
+          (hash s cc id)))
+      (send
+        (enc (enc &quot;answer&quot; (privk p))
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id))))))</pre>
 
-<p id="k0">Item <a href="#t0">0</a>.</p>
+<p id="k0">Item <a href="#t0">0</a>, Child: <a href="#k1">1</a>.</p>
 
 <div>
  <svg
-  class='diagram' width='179.880pt' height='829.920pt'
+  class='diagram' width='79.920pt' height='754.920pt'
   xmlns='http://www.w3.org/2000/svg' version='1.1'
-  viewBox='0 0 179.880 829.920' font-size='12.000'>
+  viewBox='0 0 79.920 754.920' font-size='12.000'>
   <defs>
    <marker
     id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
@@ -67,28 +74,19 @@
      style='stroke-width: 2; fill: none; stroke: black;'/></marker>
    </defs>
   <line
-   x1='139.920' y1='114.960' x2='139.920' y2='189.960'
+   x1='39.960' y1='114.960' x2='39.960' y2='714.960'
    style='stroke-width: 0.960; stroke: gray;'/>
-  <line
-   x1='39.960' y1='114.960' x2='39.960' y2='789.960'
-   style='stroke-width: 0.960; stroke: gray;'/>
-  <g><title>answer</title><circle cx='139.920' cy='189.960' r='6.000'/>
-   </g>
-  <g><title>answer</title>
-   <circle style='fill: blue;' cx='139.920' cy='114.960' r='6.000'/></g>
-  <g><title>answer</title>
-   <circle style='fill: orange;' cx='39.960' cy='789.960' r='6.000'/>
-   </g>
+  <g>
+   <title>(enc (enc &quot;answer&quot; (privk p)) enc_cookie (hash s cc id))</title>
+   <circle style='fill: red;' cx='39.960' cy='714.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;request&quot; request enc_cookie (hash s cc id))</title>
-   <circle cx='39.960' cy='714.960' r='6.000'/></g>
+   <circle cx='39.960' cy='639.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;login-success&quot; enc_cookie (hash s cc id))</title>
-   <circle style='fill: blue;' cx='39.960' cy='639.960' r='6.000'/></g>
+   <circle style='fill: blue;' cx='39.960' cy='564.960' r='6.000'/></g>
   <g><title>(enc &quot;login-request&quot; cred (hash s cc id))</title>
-   <circle cx='39.960' cy='564.960' r='6.000'/></g>
-  <g><title>&quot;empty&quot;</title>
-   <circle style='fill: gray;' cx='39.960' cy='489.960' r='6.000'/></g>
+   <circle cx='39.960' cy='489.960' r='6.000'/></g>
   <g><title>(enc cc (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
@@ -99,23 +97,124 @@
    <circle style='fill: blue;' cx='39.960' cy='189.960' r='6.000'/></g>
   <g><title>cc</title><circle cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((enc_cookie enc_cookie) (cc cc) (id id) (s s) (cred cred) (request request) (answer answer) (pk pk))</title>
+   <title>((enc_cookie enc_cookie) (cc cc) (id id) (s s) (cred cred) (request request) (p p) (pk pk))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
-  <text x='89.940' y='39.960' style='text-anchor: middle;'>sbp 0</text>
+  <text x='39.960' y='39.960' style='text-anchor: middle;'>sbp 0</text>
   </svg></div>
 
 <pre>(defskeleton sbp
-  (vars (enc_cookie mesg) (answer cc id s cred request data) (pk akey))
-  (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
-    (cred cred) (request request) (answer answer) (pk pk))
-  (deflistener answer)
+  (vars (enc_cookie mesg) (cc id s cred request data) (p name)
+    (pk akey))
+  (defstrand client 9 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
+    (cred cred) (request request) (p p) (pk pk))
+  (non-orig (privk p))
   (uniq-gen cc s)
   (label 0)
-  (unrealized (0 9))
-  (dead)
+  (unrealized (0 8))
   (origs)
-  (comment &quot;empty cohort&quot;))</pre>
+  (comment &quot;1 in cohort - 1 not yet seen&quot;))</pre>
+
+<p id="k1">Item <a href="#t0">1</a>, Parent: <a href="#k0">0</a>.</p>
+
+<div>
+ <svg
+  class='diagram' width='179.880pt' height='754.920pt'
+  xmlns='http://www.w3.org/2000/svg' version='1.1'
+  viewBox='0 0 179.880 754.920' font-size='12.000'>
+  <defs>
+   <marker
+    id='arrow' orient='auto' markerWidth='5' markerHeight='10' refX='5'
+    refY='5'>
+    <path
+     d='M 0 0 5 5 0 10'
+     style='stroke-width: 2; fill: none; stroke: black;'/></marker>
+   </defs>
+  <line
+   x1='139.920' y1='114.960' x2='139.920' y2='714.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <line
+   x1='39.960' y1='114.960' x2='39.960' y2='714.960'
+   style='stroke-width: 0.960; stroke: gray;'/>
+  <path
+   d='M 139.920 714.960 Q 92.940 714.960 45.960 714.960'
+   style='stroke-dasharray: 6.000,2.400; stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
+  <g>
+   <title>(enc (enc &quot;answer&quot; (privk p)) (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
+   <circle cx='139.920' cy='714.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;request&quot; request-0 (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
+   <circle style='fill: blue;' cx='139.920' cy='639.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;login-success&quot; (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
+   <circle cx='139.920' cy='564.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;login-request&quot; cred-0 (hash s-0 cc-0 id-0))</title>
+   <circle style='fill: blue;' cx='139.920' cy='489.960' r='6.000'/></g>
+  <g><title>(enc cc-0 (hash s-0 cc-0 id-0))</title>
+   <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
+  <g><title>(enc id-0 (hash s-0 cc-0 id-0))</title>
+   <circle cx='139.920' cy='339.960' r='6.000'/></g>
+  <g><title>(enc s-0 pk-0)</title>
+   <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
+  <g><title>(cat id-0 pk-0)</title>
+   <circle cx='139.920' cy='189.960' r='6.000'/></g>
+  <g><title>cc-0</title>
+   <circle style='fill: blue;' cx='139.920' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>(enc (enc &quot;answer&quot; (privk p)) enc_cookie (hash s cc id))</title>
+   <circle style='fill: blue;' cx='39.960' cy='714.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;request&quot; request enc_cookie (hash s cc id))</title>
+   <circle cx='39.960' cy='639.960' r='6.000'/></g>
+  <g>
+   <title>(enc &quot;login-success&quot; enc_cookie (hash s cc id))</title>
+   <circle style='fill: blue;' cx='39.960' cy='564.960' r='6.000'/></g>
+  <g><title>(enc &quot;login-request&quot; cred (hash s cc id))</title>
+   <circle cx='39.960' cy='489.960' r='6.000'/></g>
+  <g><title>(enc cc (hash s cc id))</title>
+   <circle style='fill: blue;' cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc id (hash s cc id))</title>
+   <circle cx='39.960' cy='339.960' r='6.000'/></g>
+  <g><title>(enc s pk)</title>
+   <circle cx='39.960' cy='264.960' r='6.000'/></g>
+  <g><title>(cat id pk)</title>
+   <circle style='fill: blue;' cx='39.960' cy='189.960' r='6.000'/></g>
+  <g><title>cc</title><circle cx='39.960' cy='114.960' r='6.000'/></g>
+  <g>
+   <title>((cc cc-0) (id id-0) (s s-0) (cred cred-0) (cookie cookie) (request request-0) (sskey sskey) (p p) (pk pk-0))</title>
+   <text
+    x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
+  <g>
+   <title>((enc_cookie enc_cookie) (cc cc) (id id) (s s) (cred cred) (request request) (p p) (pk pk))</title>
+   <text
+    x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
+  <text
+   x='89.940' y='39.960'
+   style='text-anchor: middle;'>sbp 1 (realized)</text></svg></div>
+
+<pre>(defskeleton sbp
+  (vars (enc_cookie mesg)
+    (cc id s cred request cc-0 id-0 s-0 cred-0 cookie request-0 sskey
+      data) (p name) (pk pk-0 akey))
+  (defstrand client 9 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
+    (cred cred) (request request) (p p) (pk pk))
+  (defstrand proxy 9 (cc cc-0) (id id-0) (s s-0) (cred cred-0)
+    (cookie cookie) (request request-0) (sskey sskey) (p p) (pk pk-0))
+  (precedes ((1 8) (0 8)))
+  (non-orig (privk p))
+  (uniq-gen cc s)
+  (operation encryption-test (added-strand proxy 9)
+    (enc &quot;answer&quot; (privk p)) (0 8))
+  (label 1)
+  (parent 0)
+  (unrealized)
+  (shape)
+  (maps
+    ((0)
+      ((cc cc) (id id) (s s) (pk pk) (p p) (cred cred) (request request)
+        (enc_cookie enc_cookie))))
+  (origs))</pre>
 
 </body>
 </html>
