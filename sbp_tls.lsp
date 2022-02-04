@@ -7,34 +7,36 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (cc id s cred request answer data) (pk akey) (enc_cookie mesg) (p name))
+    (vars (cc id s cred request answer data) (enc_cookie mesg) (p name))
     (trace
       (send cc)
-      (recv (cat id pk))
-      (send (enc s  pk))
+      (recv (cat id (pubk p)))
+      (send (enc s  (pubk p)))
       (send (enc id (hash s cc id)))
       (recv (enc cc (hash s cc id)))
-      (send (enc "login-request"   cred                  (hash s cc id)))
-      (recv (enc "login-success"             enc_cookie  (hash s cc id))) 
-      (send (enc "request"        request    enc_cookie  (hash s cc id))) 
-      (recv (enc  (enc "answer" (privk p))   enc_cookie  (hash s cc id)))
+
+      (send (enc "login-request"      cred                    (hash s cc id)))
+      (recv (enc "login-success"                  enc_cookie  (hash s cc id))) 
+      (send (enc "request"           request      enc_cookie  (hash s cc id))) 
+      (recv (enc (enc "answer" answer (privk p))              (hash s cc id)))
     )
   )
   
   (defrole proxy ;; encryption of cookie and communication with server are out of scope
-    (vars (cc id s cred cookie request answer sskey data) (pk akey) (p name))
+    (vars (cc id s cred cookie request answer sskey data) (p name))
     (trace
       (recv cc)
-      (send (cat id pk))
-      (recv (enc s  pk))
+      (send (cat id (pubk p)))
+      (recv (enc s  (pubk p)))
       (send (enc id (hash s cc id)))
       (recv (enc cc (hash s cc id)))
 
-      (recv (enc "login-request" cred                                                  (hash s cc id)))
-      (send (enc "login-success"            (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
-      (recv (enc "request"       request    (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
-      (send (enc (enc "answer" (privk p))   (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (recv (enc "login-request" cred                                                        (hash s cc id)))
+      (send (enc "login-success"                  (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (recv (enc "request"       request          (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (send (enc (enc "answer" answer (privk p))                                             (hash s cc id)))
     )
+    (uniq-gen answer)
   )
 
 )
@@ -42,17 +44,16 @@
 ;; from the perspective of the client, with a listener for the answer
 ;; it probably will need the proxy cuz proxy has the answer
 (defskeleton sbp
-  (vars (cc id s cred cookie request answer data) (pk akey) (p name))
-  (defstrandmax client (cc cc) (id id) (s s) (pk pk) (p p))
+  (vars (cc id s cred cookie request answer data) (p name))
+  (defstrandmax client (cc cc) (id id) (s s) (cred cred) (answer answer) (p p))
   ;;(defstrandmax proxy  (answer answer) (c c) (p p))
   ;;(deflistener answer)
-  
+  ;;(deflistener s)
+  ;;(deflistener cred)
   (uniq-gen cc)
   ;;(uniq-gen id)
   (uniq-gen s)
-  ;;(non-orig (invk pk))
   (non-orig (privk p))
-  ;;(uniq-gen cookie)
   ;;(non-orig sskey)
 )
 
