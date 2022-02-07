@@ -5,16 +5,10 @@
   (defrole client
     (vars (cc id s cred request answer data) (enc_cookie mesg) (p name))
     (trace
-      (send cc)
-      (recv (cat id (pubk p)))
-      (send (enc s  (pubk p)))
-      (send (enc id (hash s cc id)))
-      (recv (enc cc (hash s cc id)))
-
-      (send (enc "login-request"      cred                    (hash s cc id)))
-      (recv (enc "login-success"                  enc_cookie  (hash s cc id))) 
-      (send (enc "request"           request      enc_cookie  (hash s cc id))) 
-      (recv (enc (enc "answer" answer (privk p))              (hash s cc id)))
+      (send (cat "login-request"      cred                    ))
+      (recv (cat "login-success"                  enc_cookie  )) 
+      (send (cat "request"           request      enc_cookie  )) 
+      (recv (cat (enc "answer" answer (privk p))              ))
     )
   )
   
@@ -37,13 +31,14 @@
 )
 
 (defskeleton sbp
-  (vars (cc id s cred cookie request answer data) (p name))
-  (defstrandmax client (cc cc) (id id) (s s) (cred cred) (answer answer) (p p))
-  (uniq-gen cc)
-  (uniq-gen s)
+  (vars (cred cookie request answer data) (p name))
+  (defstrandmax client (cred cred) (answer answer) (p p))
   (non-orig (privk p))
 )
 
+  ;;(uniq-gen cc)
+  ;;(uniq-gen s)
+  
   ;;(defstrandmax proxy  (answer answer) (c c) (p p))
   ;;(deflistener answer)
   ;;(deflistener s)
