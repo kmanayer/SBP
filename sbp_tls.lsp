@@ -42,7 +42,6 @@
   (uniq-gen cc)
   (uniq-gen s)
   (non-orig (privk p))
-
 )
 
   ;;(defstrandmax proxy  (answer answer) (c c) (p p))
