@@ -1,7 +1,3 @@
-;;(defconstant tlskey (ltk client proxy)) - try using long term keys after we get it working
-;; one idea is to router all malicious traffic through client via rogue browser plugin
-;; another idea is rogue browser plugin, can they add a root CA?
-
 (herald "Session Binding Protocol (SBP)" )
 
 (defprotocol sbp basic
@@ -21,7 +17,7 @@
     )
   )
   
-  (defrole proxy ;; encryption of cookie and communication with server are out of scope
+  (defrole proxy
     (vars (cc id s cred cookie request answer sskey data) (pk akey) (p name))
     (trace
       (recv cc)
@@ -39,21 +35,21 @@
 
 )
 
-;; from the perspective of the client, with a listener for the answer
-;; it probably will need the proxy cuz proxy has the answer
 (defskeleton sbp
   (vars (cc id s cred cookie request answer data) (pk akey) (p name))
   (defstrandmax client (cc cc) (id id) (s s) (pk pk) (p p))
-  ;;(defstrandmax proxy  (answer answer) (c c) (p p))
-  ;;(deflistener answer)
-  
   (uniq-gen cc)
-  ;;(uniq-gen id)
   (uniq-gen s)
-  ;;(non-orig (invk pk))
   (non-orig (privk p))
-  ;;(uniq-gen cookie)
-  ;;(non-orig sskey)
 )
 
+  ;;(defstrandmax proxy  (answer answer) (c c) (p p))
+  ;;(deflistener answer)
+  ;;(uniq-gen id)
+  ;;(non-orig (invk pk))
+  ;;(uniq-gen cookie)
+  ;;(non-orig sskey)
+  ;;(defconstant tlskey (ltk client proxy)) - try using long term keys after we get it working
+  ;; one idea is to router all malicious traffic through client via rogue browser plugin
+  ;; another idea is rogue browser plugin, can they add a root CA?
 
