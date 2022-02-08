@@ -11,15 +11,16 @@
       (send (enc id (hash s cc id)))
       (recv (enc cc (hash s cc id)))
 
-      (send (enc "login-request"      cred                    (hash s cc id)))
-      (recv (enc "login-success"                  enc_cookie  (hash s cc id))) 
-      (send (enc "request"           request      enc_cookie  (hash s cc id))) 
-      (recv (enc (enc "answer" answer (privk p))              (hash s cc id)))
+      (send (enc "login-request" cred                                    (hash s cc id)))
+      (recv (enc "login-success"                             enc_cookie  (hash s cc id)))
+      (send (enc "embedded link w/ malicious request"        enc_cookie  (hash s cc id))) 
+      (send (enc "actual post"                               enc_cookie  (hash s cc id))) 
+      (recv (enc (enc "answer" answer (privk p))                         (hash s cc id)))
     )
   )
   
   (defrole proxy
-    (vars (cc id s cred cookie request answer sskey data) (p name))
+    (vars (cc id s cred cookie request answer sskey data) (p name) (msg mesg))
     (trace
       (recv cc)
       (send (cat id (pubk p)))
@@ -29,7 +30,7 @@
 
       (recv (enc "login-request" cred                                                        (hash s cc id)))
       (send (enc "login-success"                  (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
-      (recv (enc "request"       request          (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (recv (enc     msg                          (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
       (send (enc (enc "answer" answer (privk p))                                             (hash s cc id)))
     )
     (uniq-gen answer)
