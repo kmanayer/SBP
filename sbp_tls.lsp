@@ -15,14 +15,14 @@
       (recv (enc "login-successful"               enc_cookie  (hash s cc id))) 
 
       (send (enc "request"                        enc_cookie  (hash s cc id))) 
-      (recv (enc (enc "answer:" answer (privk p))              (hash s cc id)))
+      (recv (enc (enc "answer:" answer (privk p))             (hash s cc id)))
     )
     (uniq-gen cc)
     (uniq-gen s)
   )
   
   (defrole proxy
-    (vars (cc id s cred cookie  answer sskey data) (c p name))
+    (vars (cc id s cred cookie answer sskey data) (c p name))
     (trace
       (recv cc)
       (send (cat id (pubk p)))
@@ -37,15 +37,20 @@
       (send (enc (enc "answer:" answer (privk p))                                            (hash s cc id)))
     )
     (uniq-gen id)
+    (non-orig sskey)
   )
 )
 
 (defskeleton sbp
-  (vars (c p name))
-  (defstrandmax client (c c) (p p))
+  (vars (cred answer data) (c p name))
+  (defstrandmax client (cred cred) (answer answer) (c c) (p p))
+  (defstrandmax proxy  (cred cred) (answer answer) (c c) (p p))
+  (uniq-gen cred)
+  (uniq-gen answer)
   (non-orig (privk c))
   (non-orig (privk p))
 )
+
 
   ;;(defstrandmax proxy  (answer answer) (c c) (p p))
   ;;(deflistener answer)
