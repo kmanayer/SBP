@@ -41,8 +41,6 @@
   )
 )
 
-
-;; client POV
 (defskeleton sbp
   (vars (cred answer data) (c p name))
   (defstrandmax client (cred cred) (answer answer) (c c) (p p))
