@@ -3,24 +3,27 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (cc id s cred request answer data) (enc_cookie mesg) (p name))
+    (vars (cc id s cred request answer data) (enc_cookie mesg) (c p name))
     (trace
       (send cc)
       (recv (cat id (pubk p)))
       (send (enc s  (pubk p)))
-      (send (enc id (hash s cc id)))
-      (recv (enc cc (hash s cc id)))
+      (recv (enc id (hash s cc id)))
+      (send (enc cc (hash s cc id)))
 
-      (send (enc "login-request" cred                                    (hash s cc id)))
-      (recv (enc "login-success"                             enc_cookie  (hash s cc id)))
-      (send (enc "embedded link w/ malicious request"        enc_cookie  (hash s cc id))) 
-      (send (enc "actual post"                               enc_cookie  (hash s cc id))) 
-      (recv (enc (enc "answer" answer (privk p))                         (hash s cc id)))
+      (send (enc (enc "login:" cred (privk c))                (hash s cc id)))
+      (recv (enc "login-successful"               enc_cookie  (hash s cc id))) 
+
+      (send (enc "malicious request"              enc_cookie  (hash s cc id)))
+      (send (enc "actual request"                 enc_cookie  (hash s cc id))) 
+      (recv (enc (enc "answer:" answer (privk p))             (hash s cc id)))
     )
+    (uniq-gen cc)
+    (uniq-gen s)
   )
   
   (defrole proxy
-    (vars (cc id s cred cookie request answer sskey data) (p name) (msg mesg))
+    (vars (cc id s cred cookie answer sskey data) (request mesg) (c p name))
     (trace
       (recv cc)
       (send (cat id (pubk p)))
@@ -28,20 +31,24 @@
       (send (enc id (hash s cc id)))
       (recv (enc cc (hash s cc id)))
 
-      (recv (enc "login-request" cred                                                        (hash s cc id)))
-      (send (enc "login-success"                  (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
-      (recv (enc     msg                          (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
-      (send (enc (enc "answer" answer (privk p))                                             (hash s cc id)))
+      (recv (enc (enc "login:" cred (privk c))                                               (hash s cc id)))
+      (send (enc "login-successful"               (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+
+      (recv (enc request                          (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (send (enc (enc "answer:" answer (privk p))                                            (hash s cc id)))
     )
-    (uniq-gen answer)
+    (uniq-gen id)
+    (non-orig sskey)
   )
 )
 
 (defskeleton sbp
-  (vars (cc id s cred cookie request answer data) (p name))
-  (defstrandmax client (cc cc) (id id) (s s) (cred cred) (answer answer) (p p))
-  (uniq-gen cc)
-  (uniq-gen s)
+  (vars (cred answer data) (c p name))
+  (defstrandmax client (cred cred) (answer answer) (c c) (p p))
+  (defstrandmax proxy  (cred cred) (answer answer) (c c) (p p))
+  (uniq-gen cred)
+  (uniq-gen answer)
+  (non-orig (privk c))
   (non-orig (privk p))
 )
 
