@@ -14,7 +14,7 @@
   )
   
   (defrole proxy
-    (vars (cc id s cred cookie answer sskey data) (request mesg) (c p name))
+    (vars (cc id s cred cookie answer sskey data) (c p name))
     (trace
       (recv cc)
       (send (cat id (pubk p)))
@@ -25,7 +25,7 @@
       (recv (enc (enc "login:" cred (privk c))                                               (hash s cc id)))
       (send (enc "login-successful"               (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
 
-      (recv (enc request                          (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
+      (recv (enc "request"                        (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p))                                            (hash s cc id)))
     )
     (uniq-gen id)

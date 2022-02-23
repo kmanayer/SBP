@@ -43,8 +43,7 @@
       (send (cat &quot;request&quot; enc_cookie))
       (recv (enc &quot;answer:&quot; answer (privk p)))))
   (defrole proxy
-    (vars (cc id s cred cookie answer sskey data) (request mesg)
-      (c p name))
+    (vars (cc id s cred cookie answer sskey data) (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
@@ -52,7 +51,7 @@
         (enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc &quot;request&quot; (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))))
     (non-orig sskey)
@@ -83,7 +82,7 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle cx='139.920' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc request (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='639.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
@@ -110,7 +109,7 @@
   <g><title>(enc &quot;login:&quot; cred (privk c))</title>
    <circle cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((request request) (cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
+   <title>((cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
@@ -121,12 +120,12 @@
   </svg></div>
 
 <pre>(defskeleton sbp
-  (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+    (c p name))
   (defstrand client 4 (enc_cookie enc_cookie) (cred cred)
     (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (cookie cookie)
+    (answer answer) (sskey sskey) (c c) (p p))
   (non-orig sskey (privk c) (privk p))
   (uniq-gen cred answer id)
   (label 0)
@@ -163,7 +162,7 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle cx='139.920' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc request (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='639.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
@@ -193,7 +192,7 @@
   <g><title>(enc &quot;login:&quot; cred (privk c))</title>
    <circle cx='39.960' cy='489.960' r='6.000'/></g>
   <g>
-   <title>((request request) (cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
+   <title>((cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
@@ -205,12 +204,12 @@
    style='text-anchor: middle;'>sbp 1 (realized)</text></svg></div>
 
 <pre>(defskeleton sbp
-  (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+    (c p name))
   (defstrand client 4 (enc_cookie enc_cookie) (cred cred)
     (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (cookie cookie)
+    (answer answer) (sskey sskey) (c c) (p p))
   (precedes ((0 0) (1 5)) ((1 8) (0 3)))
   (non-orig sskey (privk c) (privk p))
   (uniq-gen cred answer id)
@@ -221,8 +220,7 @@
   (maps
     ((0 1)
       ((cred cred) (answer answer) (c c) (p p) (enc_cookie enc_cookie)
-        (cc cc) (id id) (s s) (cookie cookie) (sskey sskey)
-        (request request))))
+        (cc cc) (id id) (s s) (cookie cookie) (sskey sskey))))
   (origs))</pre>
 
 </body>
