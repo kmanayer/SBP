@@ -12,7 +12,7 @@
     (vars (cc id s cred answer data) (enc_cookie mesg) (pk akey)
       (c p name))
     (trace (send cc) (recv (cat id pk)) (send (enc s pk))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "request" enc_cookie (hash s cc id)))
@@ -21,7 +21,7 @@
   (defrole proxy
     (vars (cc id s cred cookie answer sskey data) (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
         (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
@@ -45,14 +45,14 @@
   (uniq-gen cred answer cc s id-0)
   (traces
     ((send cc) (recv (cat id pk)) (send (enc s pk))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc-0) (send (cat id-0 (pubk p))) (recv (enc s-0 (pubk p)))
-      (send (enc id-0 (hash s-0 cc-0 id-0)))
-      (recv (enc cc-0 (hash s-0 cc-0 id-0)))
+      (recv (enc id-0 (hash s-0 cc-0 id-0)))
+      (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
         (enc "login-successful"
@@ -82,14 +82,14 @@
   (uniq-gen cred answer cc s id-0)
   (traces
     ((send cc) (recv (cat id pk)) (send (enc s pk))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc-0) (send (cat id-0 (pubk p))) (recv (enc s-0 (pubk p)))
-      (send (enc id-0 (hash s-0 cc-0 id-0)))
-      (recv (enc cc-0 (hash s-0 cc-0 id-0)))
+      (recv (enc id-0 (hash s-0 cc-0 id-0)))
+      (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
         (enc "login-successful"

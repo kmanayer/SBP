@@ -8,8 +8,8 @@
       (send cc)
       (recv (cat id pk))
       (send (enc s  pk))
-      (recv (enc id (hash s cc id)))
-      (send (enc cc (hash s cc id)))
+      (send (enc id (hash s cc id)))
+      (recv (enc cc (hash s cc id)))
 
       (send (enc (enc "login:" cred (privk c))                (hash s cc id)))
       (recv (enc "login-successful"               enc_cookie  (hash s cc id))) 
@@ -27,8 +27,8 @@
       (recv cc)
       (send (cat id (pubk p)))
       (recv (enc s  (pubk p)))
-      (send (enc id (hash s cc id)))
-      (recv (enc cc (hash s cc id)))
+      (recv (enc id (hash s cc id)))
+      (send (enc cc (hash s cc id)))
 
       (recv (enc (enc "login:" cred (privk c))                                               (hash s cc id)))
       (send (enc "login-successful"               (enc cookie (hash sskey (hash s cc id)))   (hash s cc id)))

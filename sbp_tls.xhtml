@@ -38,7 +38,7 @@
     (vars (cc id s cred answer data) (enc_cookie mesg) (pk akey)
       (c p name))
     (trace (send cc) (recv (cat id pk)) (send (enc s pk))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
       (recv (enc &quot;login-successful&quot; enc_cookie (hash s cc id)))
       (send (enc &quot;request&quot; enc_cookie (hash s cc id)))
@@ -47,7 +47,7 @@
   (defrole proxy
     (vars (cc id s cred cookie answer sskey data) (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
       (send
         (enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id)))
@@ -93,9 +93,9 @@
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s-0 cc-0 id-0))</title>
    <circle style='fill: red;' cx='139.920' cy='489.960' r='6.000'/></g>
   <g><title>(enc cc-0 (hash s-0 cc-0 id-0))</title>
-   <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
+   <circle cx='139.920' cy='414.960' r='6.000'/></g>
   <g><title>(enc id-0 (hash s-0 cc-0 id-0))</title>
-   <circle cx='139.920' cy='339.960' r='6.000'/></g>
+   <circle style='fill: blue;' cx='139.920' cy='339.960' r='6.000'/></g>
   <g><title>(enc s-0 (pubk p))</title>
    <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
   <g><title>(cat id-0 (pubk p))</title>
@@ -114,9 +114,9 @@
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
    <circle cx='39.960' cy='489.960' r='6.000'/></g>
   <g><title>(enc cc (hash s cc id))</title>
-   <circle cx='39.960' cy='414.960' r='6.000'/></g>
+   <circle style='fill: blue;' cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
-   <circle style='fill: blue;' cx='39.960' cy='339.960' r='6.000'/></g>
+   <circle cx='39.960' cy='339.960' r='6.000'/></g>
   <g><title>(enc s pk)</title>
    <circle cx='39.960' cy='264.960' r='6.000'/></g>
   <g><title>(cat id pk)</title>
@@ -186,9 +186,9 @@
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s-0 cc-0 id-0))</title>
    <circle style='fill: blue;' cx='139.920' cy='489.960' r='6.000'/></g>
   <g><title>(enc cc-0 (hash s-0 cc-0 id-0))</title>
-   <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
+   <circle cx='139.920' cy='414.960' r='6.000'/></g>
   <g><title>(enc id-0 (hash s-0 cc-0 id-0))</title>
-   <circle cx='139.920' cy='339.960' r='6.000'/></g>
+   <circle style='fill: blue;' cx='139.920' cy='339.960' r='6.000'/></g>
   <g><title>(enc s-0 (pubk p))</title>
    <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
   <g><title>(cat id-0 (pubk p))</title>
@@ -210,9 +210,9 @@
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
    <circle cx='39.960' cy='489.960' r='6.000'/></g>
   <g><title>(enc cc (hash s cc id))</title>
-   <circle cx='39.960' cy='414.960' r='6.000'/></g>
+   <circle style='fill: blue;' cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
-   <circle style='fill: blue;' cx='39.960' cy='339.960' r='6.000'/></g>
+   <circle cx='39.960' cy='339.960' r='6.000'/></g>
   <g><title>(enc s pk)</title>
    <circle cx='39.960' cy='264.960' r='6.000'/></g>
   <g><title>(cat id pk)</title>
