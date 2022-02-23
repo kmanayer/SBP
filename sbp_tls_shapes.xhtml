@@ -53,7 +53,7 @@
   (defrole client
     (vars (cc id s cred answer data) (enc_cookie mesg) (c p name))
     (trace (send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (recv (enc cc (hash s cc id))) (send (enc id (hash s cc id)))
       (send (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
       (recv (enc &quot;login-successful&quot; enc_cookie (hash s cc id)))
       (send (enc &quot;malicious request&quot; enc_cookie (hash s cc id)))
@@ -64,7 +64,7 @@
     (vars (cc id s cred cookie answer sskey data) (request mesg)
       (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
+      (send (enc cc (hash s cc id))) (recv (enc id (hash s cc id)))
       (recv (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
       (send
         (enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id)))
@@ -109,9 +109,9 @@
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s-0 cc-0 id-0))</title>
    <circle style='fill: red;' cx='139.920' cy='489.960' r='6.000'/></g>
-  <g><title>(enc cc-0 (hash s-0 cc-0 id-0))</title>
-   <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
   <g><title>(enc id-0 (hash s-0 cc-0 id-0))</title>
+   <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
+  <g><title>(enc cc-0 (hash s-0 cc-0 id-0))</title>
    <circle cx='139.920' cy='339.960' r='6.000'/></g>
   <g><title>(enc s-0 (pubk p))</title>
    <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
@@ -134,9 +134,9 @@
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
    <circle cx='39.960' cy='489.960' r='6.000'/></g>
-  <g><title>(enc cc (hash s cc id))</title>
-   <circle cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
+   <circle cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle style='fill: red;' cx='39.960' cy='339.960' r='6.000'/></g>
   <g><title>(enc s (pubk p))</title>
    <circle cx='39.960' cy='264.960' r='6.000'/></g>
@@ -209,12 +209,12 @@
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='489.960' r='6.000'/></g>
-  <g><title>(enc cc (hash s cc id))</title>
+  <g><title>(enc id (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
   <path
    d='M 139.920 339.960 Q 92.940 339.960 45.960 339.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc id (hash s cc id))</title>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle cx='139.920' cy='339.960' r='6.000'/></g>
   <g><title>(enc s (pubk p))</title>
    <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
@@ -249,9 +249,9 @@
   <path
    d='M 39.960 414.960 Q 86.940 414.960 133.920 414.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc cc (hash s cc id))</title>
-   <circle cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
+   <circle cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='339.960' r='6.000'/></g>
   <path
    d='M 39.960 264.960 Q 86.940 264.960 133.920 264.960'
@@ -343,12 +343,12 @@
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='489.960' r='6.000'/></g>
-  <g><title>(enc cc (hash s cc id))</title>
+  <g><title>(enc id (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
   <path
    d='M 139.920 339.960 Q 92.940 339.960 45.960 339.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc id (hash s cc id))</title>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle cx='139.920' cy='339.960' r='6.000'/></g>
   <g><title>(enc s (pubk p))</title>
    <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
@@ -383,9 +383,9 @@
   <path
    d='M 39.960 414.960 Q 86.940 414.960 133.920 414.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc cc (hash s cc id))</title>
-   <circle cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
+   <circle cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='339.960' r='6.000'/></g>
   <path
    d='M 39.960 264.960 Q 86.940 264.960 133.920 264.960'
@@ -477,12 +477,12 @@
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='489.960' r='6.000'/></g>
-  <g><title>(enc cc (hash s cc id))</title>
+  <g><title>(enc id (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='414.960' r='6.000'/></g>
   <path
    d='M 139.920 339.960 Q 92.940 339.960 45.960 339.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc id (hash s cc id))</title>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle cx='139.920' cy='339.960' r='6.000'/></g>
   <g><title>(enc s (pubk p))</title>
    <circle style='fill: blue;' cx='139.920' cy='264.960' r='6.000'/></g>
@@ -514,9 +514,9 @@
   <path
    d='M 39.960 414.960 Q 86.940 414.960 133.920 414.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
-  <g><title>(enc cc (hash s cc id))</title>
-   <circle cx='39.960' cy='414.960' r='6.000'/></g>
   <g><title>(enc id (hash s cc id))</title>
+   <circle cx='39.960' cy='414.960' r='6.000'/></g>
+  <g><title>(enc cc (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='339.960' r='6.000'/></g>
   <path
    d='M 39.960 264.960 Q 86.940 264.960 133.920 264.960'
