@@ -19,15 +19,15 @@
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     (uniq-gen cc s))
   (defrole proxy
-    (vars (cc id s cred cookie answer sskey data) (c p name))
+    (vars (cc id s cred iv cookie answer sskey data) (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     (non-orig sskey)
@@ -35,14 +35,14 @@
 
 (defskeleton sbp
   (vars (enc_cookie mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name)
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name)
     (pk akey))
   (defstrand client 9 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p) (pk pk))
-  (defstrand proxy 9 (cc cc-0) (id id-0) (s s-0) (cred cred)
+  (defstrand proxy 9 (cc cc-0) (id id-0) (s s-0) (cred cred) (iv iv)
     (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (traces
     ((send cc) (recv (cat id pk)) (send (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
@@ -55,11 +55,11 @@
       (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (recv
-        (enc "request" (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
+        (enc "request" iv (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (send
         (enc (enc "answer:" answer (privk p)) (hash s-0 cc-0 id-0)))))
@@ -71,15 +71,15 @@
 
 (defskeleton sbp
   (vars (enc_cookie mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name)
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name)
     (pk akey))
   (defstrand client 9 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p) (pk pk))
-  (defstrand proxy 9 (cc cc-0) (id id-0) (s s-0) (cred cred)
+  (defstrand proxy 9 (cc cc-0) (id id-0) (s s-0) (cred cred) (iv iv)
     (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (precedes ((0 5) (1 5)) ((1 8) (0 8)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (traces
     ((send cc) (recv (cat id pk)) (send (enc s pk))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
@@ -92,11 +92,11 @@
       (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (recv
-        (enc "request" (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
+        (enc "request" iv (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (send
         (enc (enc "answer:" answer (privk p)) (hash s-0 cc-0 id-0)))))
@@ -106,8 +106,8 @@
   (shape)
   (maps
     ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie enc_cookie) (pk pk) (cc-0 cc-0) (id-0 id-0)
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s) (enc_cookie enc_cookie) (pk pk) (cc-0 cc-0) (id-0 id-0)
         (s-0 s-0) (cookie cookie) (sskey sskey))))
   (origs))
 
