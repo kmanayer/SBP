@@ -11,29 +11,29 @@
       (send (cat "request" enc_cookie))
       (recv (enc "answer:" answer (privk p)))))
   (defrole proxy
-    (vars (cc id s cred cookie answer sskey data) (c p name))
+    (vars (cc id s cred iv cookie answer sskey data) (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     (non-orig sskey)
     (uniq-gen id)))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 4 (enc_cookie enc_cookie) (cred cred)
     (answer answer) (c c) (p p))
-  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (cookie cookie)
-    (answer answer) (sskey sskey) (c c) (p p))
+  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (iv iv)
+    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer id)
+  (uniq-gen cred answer iv id)
   (traces
     ((send (enc "login:" cred (privk c)))
       (recv (cat "login-successful" enc_cookie))
@@ -43,10 +43,10 @@
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 0)
@@ -56,15 +56,15 @@
   (comment "Not a skeleton"))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 4 (enc_cookie enc_cookie) (cred cred)
     (answer answer) (c c) (p p))
-  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (cookie cookie)
-    (answer answer) (sskey sskey) (c c) (p p))
+  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (iv iv)
+    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (precedes ((0 0) (1 5)) ((1 8) (0 3)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer id)
+  (uniq-gen cred answer iv id)
   (traces
     ((send (enc "login:" cred (privk c)))
       (recv (cat "login-successful" enc_cookie))
@@ -74,10 +74,10 @@
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 1)
@@ -86,8 +86,9 @@
   (shape)
   (maps
     ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (enc_cookie enc_cookie)
-        (cc cc) (id id) (s s) (cookie cookie) (sskey sskey))))
+      ((cred cred) (answer answer) (iv iv) (c c) (p p)
+        (enc_cookie enc_cookie) (cc cc) (id id) (s s) (cookie cookie)
+        (sskey sskey))))
   (origs))
 
 (comment "Nothing left to do")
