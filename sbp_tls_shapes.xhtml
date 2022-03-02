@@ -26,21 +26,21 @@
   <text
    x='89.880' y='176.040'
    style='font-weight: bold; text-anchor: middle; fill: blue;'
-   onclick='window.open(&quot;#k25&quot;, &quot;_self&quot;)'>25</text>
+   onclick='window.open(&quot;#k21&quot;, &quot;_self&quot;)'>21</text>
   <line
    x1='39.960' y1='114.960' x2='89.880' y2='189.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <text
    x='89.880' y='101.040'
    style='font-weight: bold; text-anchor: middle; fill: blue;'
-   onclick='window.open(&quot;#k22&quot;, &quot;_self&quot;)'>22</text>
+   onclick='window.open(&quot;#k14&quot;, &quot;_self&quot;)'>14</text>
   <line
    x1='39.960' y1='114.960' x2='89.880' y2='114.960'
    style='stroke-width: 0.960; stroke: gray;'/>
   <text
    x='89.880' y='26.040'
    style='font-weight: bold; text-anchor: middle; fill: blue;'
-   onclick='window.open(&quot;#k19&quot;, &quot;_self&quot;)'>19</text>
+   onclick='window.open(&quot;#k12&quot;, &quot;_self&quot;)'>12</text>
   <line
    x1='39.960' y1='114.960' x2='89.880' y2='39.960'
    style='stroke-width: 0.960; stroke: gray;'/>
@@ -57,26 +57,26 @@
       (send (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
       (recv (enc &quot;login-successful&quot; enc_cookie (hash s cc id)))
       (send (enc &quot;malicious request&quot; enc_cookie (hash s cc id)))
-      (send (enc &quot;actual request&quot; enc_cookie (hash s cc id)))
+      (send (enc &quot;request&quot; enc_cookie (hash s cc id)))
       (recv (enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))))
     (uniq-gen cc s))
   (defrole proxy
-    (vars (cc id s cred cookie answer sskey data) (request mesg)
+    (vars (cc id s cred iv cookie answer sskey data) (request mesg)
       (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id)))
       (send
-        (enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc &quot;login-successful&quot; iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))))
     (non-orig sskey)
     (uniq-gen id)))</pre>
 
-<p id="k0">Item <a href="#t0">0</a>, Children: <a href="#k19">19</a> <a href="#k22">22</a> <a href="#k25">25</a>.</p>
+<p id="k0">Item <a href="#t0">0</a>, Children: <a href="#k12">12</a> <a href="#k14">14</a> <a href="#k21">21</a>.</p>
 
 <div>
  <svg
@@ -101,10 +101,10 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s-0 cc-0 id-0))</title>
    <circle cx='139.920' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc request (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
+   <title>(enc request iv (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
    <circle style='fill: blue;' cx='139.920' cy='639.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s-0 cc-0 id-0))) (hash s-0 cc-0 id-0))</title>
    <circle cx='139.920' cy='564.960' r='6.000'/></g>
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s-0 cc-0 id-0))</title>
@@ -122,8 +122,7 @@
   <g>
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle style='fill: red;' cx='39.960' cy='789.960' r='6.000'/></g>
-  <g>
-   <title>(enc &quot;actual request&quot; enc_cookie (hash s cc id))</title>
+  <g><title>(enc &quot;request&quot; enc_cookie (hash s cc id))</title>
    <circle cx='39.960' cy='714.960' r='6.000'/></g>
   <g>
    <title>(enc &quot;malicious request&quot; enc_cookie (hash s cc id))</title>
@@ -144,7 +143,7 @@
    <circle style='fill: blue;' cx='39.960' cy='189.960' r='6.000'/></g>
   <g><title>cc</title><circle cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((request request) (cc cc-0) (id id-0) (s s-0) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
+   <title>((request request) (cc cc-0) (id id-0) (s s-0) (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
@@ -156,21 +155,21 @@
 
 <pre>(defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc-0) (id id-0) (s s-0)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (label 0)
   (unrealized (0 4) (0 6) (0 9) (1 5))
   (preskeleton)
   (origs)
   (comment &quot;Not a skeleton&quot;))</pre>
 
-<p id="k19">Item <a href="#t0">19</a>, Parent: <a href="#k0">0</a>.</p>
+<p id="k12">Item <a href="#t0">12</a>, Parent: <a href="#k0">0</a>.</p>
 
 <div>
  <svg
@@ -198,13 +197,13 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle cx='139.920' cy='789.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;actual request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='714.960' r='6.000'/></g>
   <path
    d='M 139.920 564.960 Q 92.940 564.960 45.960 564.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='139.920' cy='564.960' r='6.000'/></g>
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
@@ -232,13 +231,13 @@
    d='M 39.960 714.960 Q 86.940 714.960 133.920 714.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g>
-   <title>(enc &quot;actual request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='39.960' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;malicious request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;malicious request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='39.960' cy='639.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='564.960' r='6.000'/></g>
   <path
    d='M 39.960 489.960 Q 86.940 489.960 133.920 489.960'
@@ -265,46 +264,46 @@
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g><title>cc</title><circle cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((request &quot;actual request&quot;) (cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
+   <title>((request &quot;request&quot;) (cc cc) (id id) (s s) (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
-   <title>((enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))</title>
+   <title>((enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id))))) (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
   <text
    x='89.940' y='39.960'
-   style='text-anchor: middle;'>sbp 19 (realized)</text></svg></div>
+   style='text-anchor: middle;'>sbp 12 (realized)</text></svg></div>
 
 <pre>(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request &quot;actual request&quot;) (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request &quot;request&quot;) (cc cc) (id id) (s s)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
     ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (displaced 2 1 proxy 7)
-    (enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id)))
-      (hash s cc id)) (0 6))
-  (label 19)
+  (uniq-gen cred answer iv cc id s)
+  (operation encryption-test (displaced 2 1 proxy 5)
+    (enc cc (hash s cc id)) (0 4))
+  (label 12)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc-0 cc)
-        (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
-        (request &quot;actual request&quot;))))
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s)
+        (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+        (cc-0 cc) (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
+        (request &quot;request&quot;))))
   (origs))</pre>
 
-<p id="k22">Item <a href="#t0">22</a>, Parent: <a href="#k0">0</a>.</p>
+<p id="k14">Item <a href="#t0">14</a>, Parent: <a href="#k0">0</a>.</p>
 
 <div>
  <svg
@@ -332,13 +331,13 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle cx='139.920' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;malicious request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;malicious request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='639.960' r='6.000'/></g>
   <path
    d='M 139.920 564.960 Q 92.940 564.960 45.960 564.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='139.920' cy='564.960' r='6.000'/></g>
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
@@ -363,16 +362,16 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='789.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;actual request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='39.960' cy='714.960' r='6.000'/></g>
   <path
    d='M 39.960 639.960 Q 86.940 639.960 133.920 639.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g>
-   <title>(enc &quot;malicious request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;malicious request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='39.960' cy='639.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='564.960' r='6.000'/></g>
   <path
    d='M 39.960 489.960 Q 86.940 489.960 133.920 489.960'
@@ -399,46 +398,46 @@
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g><title>cc</title><circle cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((request &quot;malicious request&quot;) (cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
+   <title>((request &quot;malicious request&quot;) (cc cc) (id id) (s s) (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
-   <title>((enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))</title>
+   <title>((enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id))))) (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
   <text
    x='89.940' y='39.960'
-   style='text-anchor: middle;'>sbp 22 (realized)</text></svg></div>
+   style='text-anchor: middle;'>sbp 14 (realized)</text></svg></div>
 
 <pre>(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request &quot;malicious request&quot;) (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
     ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (displaced 2 1 proxy 7)
-    (enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id)))
-      (hash s cc id)) (0 6))
-  (label 22)
+  (uniq-gen cred answer iv cc id s)
+  (operation encryption-test (displaced 2 1 proxy 5)
+    (enc cc (hash s cc id)) (0 4))
+  (label 14)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc-0 cc)
-        (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s)
+        (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+        (cc-0 cc) (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
         (request &quot;malicious request&quot;))))
   (origs))</pre>
 
-<p id="k25">Item <a href="#t0">25</a>, Parent: <a href="#k0">0</a>.</p>
+<p id="k21">Item <a href="#t0">21</a>, Parent: <a href="#k0">0</a>.</p>
 
 <div>
  <svg
@@ -466,13 +465,13 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle cx='139.920' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='139.920' cy='639.960' r='6.000'/></g>
   <path
    d='M 139.920 564.960 Q 92.940 564.960 45.960 564.960'
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='139.920' cy='564.960' r='6.000'/></g>
   <g>
    <title>(enc (enc &quot;login:&quot; cred (privk c)) (hash s cc id))</title>
@@ -497,13 +496,13 @@
    <title>(enc (enc &quot;answer:&quot; answer (privk p)) (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='789.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;actual request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='39.960' cy='714.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;malicious request&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;malicious request&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle cx='39.960' cy='639.960' r='6.000'/></g>
   <g>
-   <title>(enc &quot;login-successful&quot; (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
+   <title>(enc &quot;login-successful&quot; iv (enc cookie (hash sskey (hash s cc id))) (hash s cc id))</title>
    <circle style='fill: blue;' cx='39.960' cy='564.960' r='6.000'/></g>
   <path
    d='M 39.960 489.960 Q 86.940 489.960 133.920 489.960'
@@ -530,41 +529,43 @@
    style='stroke-width: 0.960; stroke: black; marker-end: url(#arrow); fill: none;'/>
   <g><title>cc</title><circle cx='39.960' cy='114.960' r='6.000'/></g>
   <g>
-   <title>((request &quot;login-successful&quot;) (cc cc) (id id) (s s) (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
+   <title>((request &quot;login-successful&quot;) (cc cc) (id id) (s s) (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))</title>
    <text
     x='139.920' y='77.460' style='text-anchor: middle;'>proxy</text></g>
   <g>
-   <title>((enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))</title>
+   <title>((enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id))))) (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))</title>
    <text
     x='39.960' y='77.460' style='text-anchor: middle;'>client</text></g>
   <text
    x='89.940' y='39.960'
-   style='text-anchor: middle;'>sbp 25 (realized)</text></svg></div>
+   style='text-anchor: middle;'>sbp 21 (realized)</text></svg></div>
 
 <pre>(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request &quot;login-successful&quot;) (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 1 proxy 7)
-    (enc &quot;login-successful&quot; (enc cookie-0 (hash sskey-0 (hash s cc id)))
-      (hash s cc id)) (0 6))
-  (label 25)
+    (enc &quot;login-successful&quot; iv-0
+      (enc cookie-0 (hash sskey-0 (hash s cc id))) (hash s cc id))
+    (0 6))
+  (label 21)
   (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc-0 cc)
-        (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s)
+        (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+        (cc-0 cc) (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
         (request &quot;login-successful&quot;))))
   (origs))</pre>
 

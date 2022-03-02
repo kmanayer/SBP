@@ -11,20 +11,20 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     (uniq-gen cc s))
   (defrole proxy
-    (vars (cc id s cred cookie answer sskey data) (request mesg)
+    (vars (cc id s cred iv cookie answer sskey data) (request mesg)
       (c p name))
     (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     (non-orig sskey)
@@ -32,32 +32,32 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc-0) (id id-0) (s s-0)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc-0) (send (cat id-0 (pubk p))) (recv (enc s-0 (pubk p)))
       (recv (enc id-0 (hash s-0 cc-0 id-0)))
       (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
+        (enc request iv (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (send
         (enc (enc "answer:" answer (privk p)) (hash s-0 cc-0 id-0)))))
@@ -69,33 +69,33 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc-0) (id id-0) (s s-0)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 5) (1 5)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc-0) (send (cat id-0 (pubk p))) (recv (enc s-0 (pubk p)))
       (recv (enc id-0 (hash s-0 cc-0 id-0)))
       (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
+        (enc request iv (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (send
         (enc (enc "answer:" answer (privk p)) (hash s-0 cc-0 id-0)))))
@@ -107,15 +107,15 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+    (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+    (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 5) (1 5)) ((1 1) (0 1))
     ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (contracted (cc-0 cc) (id-0 id) (s-0 s))
     (enc "login:" cred (privk c)) (1 5)
     (enc (enc "login:" cred (privk c)) (hash s cc id)))
@@ -125,16 +125,16 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 2)
@@ -145,16 +145,16 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc-0) (id id-0) (s s-0)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 2) (2 0)) ((0 5) (1 5)) ((1 8) (0 9)) ((2 1) (1 5)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (operation encryption-test (added-listener (hash s cc id))
     (enc "login:" cred (privk c)) (1 5)
     (enc (enc "login:" cred (privk c)) (hash s cc id)))
@@ -164,18 +164,18 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc-0) (send (cat id-0 (pubk p))) (recv (enc s-0 (pubk p)))
       (recv (enc id-0 (hash s-0 cc-0 id-0)))
       (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
+        (enc request iv (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (send
         (enc (enc "answer:" answer (privk p)) (hash s-0 cc-0 id-0))))
@@ -187,15 +187,15 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+    (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+    (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 0 client 4)
     (enc id (hash s cc id)) (1 3))
   (traces
@@ -204,16 +204,16 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 4)
@@ -224,16 +224,16 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+    (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+    (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 8) (0 9)) ((2 1) (1 3)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (hash s cc id))
     (enc id (hash s cc id)) (1 3))
   (traces
@@ -242,16 +242,16 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id))))
@@ -262,18 +262,18 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
+    (cred answer iv cc id s cc-0 id-0 s-0 cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc-0) (id id-0) (s s-0)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (deflistener (cat s cc id))
   (precedes ((0 2) (3 0)) ((0 5) (1 5)) ((1 8) (0 9)) ((2 1) (1 5))
     ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc s id-0)
+  (uniq-gen cred answer iv cc s id-0)
   (operation encryption-test (added-listener (cat s cc id))
     (hash s cc id) (2 0))
   (traces
@@ -282,18 +282,18 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc-0) (send (cat id-0 (pubk p))) (recv (enc s-0 (pubk p)))
       (recv (enc id-0 (hash s-0 cc-0 id-0)))
       (send (enc cc-0 (hash s-0 cc-0 id-0)))
       (recv (enc (enc "login:" cred (privk c)) (hash s-0 cc-0 id-0)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
+        (enc request iv (enc cookie (hash sskey (hash s-0 cc-0 id-0)))
           (hash s-0 cc-0 id-0)))
       (send
         (enc (enc "answer:" answer (privk p)) (hash s-0 cc-0 id-0))))
@@ -306,109 +306,109 @@
   (comment "empty cohort"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request "request") (cc cc) (id id) (s s)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 8) (1 7)) ((1 1) (0 1)) ((1 8) (0 9)))
+    ((0 8) (1 7)) ((1 1) (0 1)) ((1 6) (0 6)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 0 client 9)
-    (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+    (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
       (hash s cc id)) (1 7))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 7)
   (parent 4)
-  (unrealized (0 4) (0 6))
+  (unrealized (0 4))
   (origs)
   (comment "2 in cohort - 2 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (1 7)) ((1 1) (0 1)) ((1 8) (0 9)))
+    ((0 7) (1 7)) ((1 1) (0 1)) ((1 6) (0 6)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 0 client 8)
-    (enc "malicious request" (enc cookie (hash sskey (hash s cc id)))
+    (enc "malicious request" iv (enc cookie (hash sskey (hash s cc id)))
       (hash s cc id)) (1 7))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 8)
   (parent 4)
-  (unrealized (0 4) (0 6))
+  (unrealized (0 4))
   (origs)
   (comment "2 in cohort - 2 not yet seen"))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 1 proxy 7)
-    (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
+    (enc "login-successful" iv (enc cookie (hash sskey (hash s cc id)))
       (hash s cc id)) (1 7))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
@@ -416,17 +416,17 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 9)
   (parent 4)
@@ -436,18 +436,18 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+    (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+    (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 8) (0 9)) ((2 1) (1 7)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (hash s cc id))
-    (enc request (enc cookie (hash sskey (hash s cc id)))
+    (enc request iv (enc cookie (hash sskey (hash s cc id)))
       (hash s cc id)) (1 7))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
@@ -455,16 +455,16 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id))))
@@ -475,17 +475,17 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+    (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+    (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (deflistener (hash s cc id))
   (deflistener (cat s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 8) (0 9)) ((2 1) (1 3)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (cat s cc id))
     (hash s cc id) (2 0))
   (traces
@@ -494,16 +494,16 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id)))
@@ -515,17 +515,18 @@
   (comment "empty cohort"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request "request") (cc cc) (id id) (s s)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 8) (0 9)))
+    ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
+    ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 1 proxy 5)
     (enc cc (hash s cc id)) (0 4))
   (traces
@@ -533,45 +534,52 @@
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 12)
   (parent 7)
-  (unrealized (0 6))
-  (origs)
-  (comment "2 in cohort - 2 not yet seen"))
+  (unrealized)
+  (shape)
+  (maps
+    ((0 1)
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s)
+        (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+        (cc-0 cc) (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
+        (request "request"))))
+  (origs))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request "request") (cc cc) (id id) (s s)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 8) (0 9))
-    ((2 1) (0 4)))
+    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 8) (0 9)) ((2 1) (0 4)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (hash s cc id))
     (enc cc (hash s cc id)) (0 4))
   (traces
@@ -579,43 +587,44 @@
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id))))
   (label 13)
   (parent 7)
-  (unrealized (0 6) (2 0))
+  (unrealized (2 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 8) (0 9)))
+    ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
+    ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 1 proxy 5)
     (enc cc (hash s cc id)) (0 4))
   (traces
@@ -623,45 +632,52 @@
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 14)
   (parent 8)
-  (unrealized (0 6))
-  (origs)
-  (comment "2 in cohort - 2 not yet seen"))
+  (unrealized)
+  (shape)
+  (maps
+    ((0 1)
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s)
+        (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+        (cc-0 cc) (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
+        (request "malicious request"))))
+  (origs))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 8) (0 9))
-    ((2 1) (0 4)))
+    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 8) (0 9)) ((2 1) (0 4)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (hash s cc id))
     (enc cc (hash s cc id)) (0 4))
   (traces
@@ -669,43 +685,43 @@
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id))))
   (label 15)
   (parent 8)
-  (unrealized (0 6) (2 0))
+  (unrealized (2 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 4) (0 4)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 1 proxy 5)
     (enc cc (hash s cc id)) (0 4))
   (traces
@@ -714,17 +730,17 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 16)
   (parent 9)
@@ -733,18 +749,18 @@
   (comment "2 in cohort - 2 not yet seen"))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 8) (0 9)) ((2 1) (0 4)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (hash s cc id))
     (enc cc (hash s cc id)) (0 4))
   (traces
@@ -753,17 +769,17 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id))))
   (label 17)
@@ -773,18 +789,18 @@
 
 (defskeleton sbp
   (vars (enc_cookie request mesg)
-    (cred answer cc id s cookie sskey data) (c p name))
+    (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
-    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+    (iv iv) (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
   (deflistener (hash s cc id))
   (deflistener (cat s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 8) (0 9)) ((2 1) (1 7))
     ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (cat s cc id))
     (hash s cc id) (2 0))
   (traces
@@ -793,16 +809,16 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash s cc id)))
+        (enc request iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id)))
@@ -813,267 +829,69 @@
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
-    ((1 8) (0 9)))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request "request") (cc cc) (id id) (s s)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
+  (deflistener (hash s cc id))
+  (deflistener (cat s cc id))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
+    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 8) (0 9)) ((2 1) (0 4)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (displaced 2 1 proxy 7)
-    (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-      (hash s cc id)) (0 6))
+  (uniq-gen cred answer iv cc id s)
+  (operation encryption-test (added-listener (cat s cc id))
+    (hash s cc id) (2 0))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
+      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
+    ((recv (hash s cc id)) (send (hash s cc id)))
+    ((recv (cat s cc id)) (send (cat s cc id))))
   (label 19)
-  (parent 12)
-  (unrealized)
-  (shape)
-  (maps
-    ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc-0 cc)
-        (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
-        (request "actual request"))))
-  (origs))
-
-(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash s cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 8) (0 9)) ((2 1) (0 6)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (added-listener (hash s cc id))
-    (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-      (hash s cc id)) (0 6))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv (hash s cc id)) (send (hash s cc id))))
-  (label 20)
-  (parent 12)
-  (unrealized (0 6) (2 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash s cc id))
-  (deflistener (cat s cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 8) (0 9))
-    ((2 1) (0 4)) ((3 1) (2 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (added-listener (cat s cc id))
-    (hash s cc id) (2 0))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv (hash s cc id)) (send (hash s cc id)))
-    ((recv (cat s cc id)) (send (cat s cc id))))
-  (label 21)
   (parent 13)
-  (unrealized (0 6) (3 0))
+  (unrealized (3 0))
   (dead)
   (comment "empty cohort"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
-    ((1 8) (0 9)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (displaced 2 1 proxy 7)
-    (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-      (hash s cc id)) (0 6))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
-  (label 22)
-  (parent 14)
-  (unrealized)
-  (shape)
-  (maps
-    ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc-0 cc)
-        (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
-        (request "malicious request"))))
-  (origs))
-
-(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash s cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 8) (0 9)) ((2 1) (0 6)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (added-listener (hash s cc id))
-    (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-      (hash s cc id)) (0 6))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv (hash s cc id)) (send (hash s cc id))))
-  (label 23)
-  (parent 14)
-  (unrealized (0 6) (2 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (deflistener (cat s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 8) (0 9))
-    ((2 1) (0 4)) ((3 1) (2 0)))
+    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 8) (0 9)) ((2 1) (0 4)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (cat s cc id))
     (hash s cc id) (2 0))
   (traces
@@ -1081,98 +899,100 @@
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id)))
     ((recv (cat s cc id)) (send (cat s cc id))))
-  (label 24)
+  (label 20)
   (parent 15)
-  (unrealized (0 6) (3 0))
+  (unrealized (3 0))
   (dead)
   (comment "empty cohort"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
+  (vars (cred answer iv cc id s cookie sskey data) (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6)) ((1 8) (0 9)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (displaced 2 1 proxy 7)
-    (enc "login-successful" (enc cookie-0 (hash sskey-0 (hash s cc id)))
-      (hash s cc id)) (0 6))
+    (enc "login-successful" iv-0
+      (enc cookie-0 (hash sskey-0 (hash s cc id))) (hash s cc id))
+    (0 6))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
       (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
           (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
-  (label 25)
+  (label 21)
   (parent 16)
   (unrealized)
   (shape)
   (maps
     ((0 1)
-      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
-        (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc-0 cc)
-        (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
+      ((cred cred) (answer answer) (iv iv) (c c) (p p) (cc cc) (id id)
+        (s s)
+        (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+        (cc-0 cc) (id-0 id) (s-0 s) (cookie cookie) (sskey sskey)
         (request "login-successful"))))
   (origs))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (2 0)) ((0 3) (1 3))
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 8) (0 9))
     ((2 1) (0 6)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (hash s cc id))
     (enc "login-successful" enc_cookie (hash s cc id)) (0 6))
   (traces
@@ -1181,39 +1001,39 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id))))
-  (label 26)
+  (label 22)
   (parent 16)
   (unrealized (2 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (deflistener (cat s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 8) (0 9)) ((2 1) (0 4))
     ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (cat s cc id))
     (hash s cc id) (2 0))
   (traces
@@ -1222,41 +1042,41 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id)))
     ((recv (cat s cc id)) (send (cat s cc id))))
-  (label 27)
+  (label 23)
   (parent 17)
   (unrealized (3 0))
   (dead)
   (comment "empty cohort"))
 
 (defskeleton sbp
-  (vars (enc_cookie request mesg) (cred answer cc id cookie sskey data)
-    (c p name))
+  (vars (enc_cookie request mesg)
+    (cred answer iv cc id cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id)
     (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 6) (3 0)) ((1 8) (0 9)) ((2 1) (1 7))
     ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (displaced 4 1 proxy 7) s (3 0)
     (enc s (pubk p)))
   (traces
@@ -1266,138 +1086,42 @@
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv (enc "login-successful" enc_cookie (hash cookie cc id)))
       (send (enc "malicious request" enc_cookie (hash cookie cc id)))
-      (send (enc "actual request" enc_cookie (hash cookie cc id)))
+      (send (enc "request" enc_cookie (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
       (recv (enc id (hash cookie cc id)))
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 28)
+  (label 24)
   (parent 18)
   (unrealized (0 4) (0 6) (3 0))
   (comment "2 in cohort - 2 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash s cc id))
-  (deflistener (cat s cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (added-listener (cat s cc id))
-    (hash s cc id) (2 0))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv (hash s cc id)) (send (hash s cc id)))
-    ((recv (cat s cc id)) (send (cat s cc id))))
-  (label 29)
-  (parent 20)
-  (unrealized (0 6) (3 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (cred answer cc id s cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash s cc id)))) (cc cc)
-    (id id) (s s) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "malicious request") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash s cc id))
-  (deflistener (cat s cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
-  (operation encryption-test (added-listener (cat s cc id))
-    (hash s cc id) (2 0))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
-      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send
-        (enc "actual request" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
-      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
-      (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
-      (recv
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
-    ((recv (hash s cc id)) (send (hash s cc id)))
-    ((recv (cat s cc id)) (send (cat s cc id))))
-  (label 30)
-  (parent 23)
-  (unrealized (0 6) (3 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id s cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id s cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
     (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id) (s s)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash s cc id))
   (deflistener (cat s cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (3 0)) ((0 3) (1 3))
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 8) (0 9))
     ((2 1) (0 6)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id s)
+  (uniq-gen cred answer iv cc id s)
   (operation encryption-test (added-listener (cat s cc id))
     (hash s cc id) (2 0))
   (traces
@@ -1406,43 +1130,44 @@
       (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (recv (enc "login-successful" enc_cookie (hash s cc id)))
       (send (enc "malicious request" enc_cookie (hash s cc id)))
-      (send (enc "actual request" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
       (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
       (send
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (recv
-        (enc "login-successful" (enc cookie (hash sskey (hash s cc id)))
-          (hash s cc id)))
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
     ((recv (hash s cc id)) (send (hash s cc id)))
     ((recv (cat s cc id)) (send (cat s cc id))))
-  (label 31)
-  (parent 26)
+  (label 25)
+  (parent 22)
   (unrealized (3 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (3 0)) ((1 8) (0 9))
+    ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (0 6)) ((1 8) (0 9))
     ((2 1) (1 7)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (displaced 4 0 client 8) cookie (3 0)
     (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -1451,16 +1176,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -1468,28 +1192,28 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 32)
-  (parent 28)
-  (unrealized (0 4) (0 6) (3 0))
+  (label 26)
+  (parent 24)
+  (unrealized (0 4) (3 0))
   (comment "2 in cohort - 2 not yet seen"))
 
 (defskeleton sbp
-  (vars (enc_cookie request mesg) (cred answer cc id cookie sskey data)
-    (c p name))
+  (vars (enc_cookie request mesg)
+    (cred answer iv cc id cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id)
     (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
@@ -1497,10 +1221,10 @@
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 6) (3 0)) ((1 8) (0 9))
     ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (added-listener (hash cookie cc id)) cookie
     (3 0) (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -1510,153 +1234,43 @@
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv (enc "login-successful" enc_cookie (hash cookie cc id)))
       (send (enc "malicious request" enc_cookie (hash cookie cc id)))
-      (send (enc "actual request" enc_cookie (hash cookie cc id)))
+      (send (enc "request" enc_cookie (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
       (recv (enc id (hash cookie cc id)))
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 33)
-  (parent 28)
+  (label 27)
+  (parent 24)
   (unrealized (0 4) (0 6) (3 0) (4 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (3 0))
-    ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation nonce-test (displaced 4 1 proxy 7) s (3 0)
-    (enc s (pubk p)))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 34)
-  (parent 29)
-  (unrealized (3 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "malicious request") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (3 0))
-    ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation nonce-test (displaced 4 1 proxy 7) s (3 0)
-    (enc s (pubk p)))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 35)
-  (parent 30)
-  (unrealized (3 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id)
     (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
+    (s cookie) (cred cred) (iv iv) (cookie cookie) (answer answer)
+    (sskey sskey) (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
     ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (3 0)) ((1 8) (0 9))
     ((2 1) (0 6)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (displaced 4 1 proxy 7) s (3 0)
     (enc s (pubk p)))
   (traces
@@ -1666,48 +1280,49 @@
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv (enc "login-successful" enc_cookie (hash cookie cc id)))
       (send (enc "malicious request" enc_cookie (hash cookie cc id)))
-      (send (enc "actual request" enc_cookie (hash cookie cc id)))
+      (send (enc "request" enc_cookie (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
       (recv (enc id (hash cookie cc id)))
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 36)
-  (parent 31)
+  (label 28)
+  (parent 25)
   (unrealized (3 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (3 0)) ((1 8) (0 9))
+    ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6)) ((1 8) (0 9))
     ((2 1) (1 7)) ((3 1) (2 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (displaced 4 0 client 9) cookie (3 0)
     (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id))) (hash cookie cc id))
-    (enc "malicious request"
+    (enc "malicious request" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -1716,16 +1331,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -1733,41 +1347,42 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 37)
-  (parent 32)
-  (unrealized (0 4) (0 6) (3 0))
+  (label 29)
+  (parent 26)
+  (unrealized (0 4) (3 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (4 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (3 0))
+    ((0 5) (1 5)) ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
     ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (added-listener (hash cookie cc id)) cookie
     (3 0) (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id))) (hash cookie cc id))
-    (enc "malicious request"
+    (enc "malicious request" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -1776,16 +1391,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -1793,29 +1407,29 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 38)
-  (parent 32)
-  (unrealized (0 4) (0 6) (3 0) (4 0))
+  (label 30)
+  (parent 26)
+  (unrealized (0 4) (3 0) (4 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (enc_cookie request mesg) (cred answer cc id cookie sskey data)
-    (c p name))
+  (vars (enc_cookie request mesg)
+    (cred answer iv cc id cookie sskey data) (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id)
     (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
@@ -1824,7 +1438,7 @@
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 6) (3 0)) ((1 8) (0 9))
     ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0)) ((5 1) (4 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation encryption-test (added-listener (cat cookie cc id))
     (hash cookie cc id) (4 0))
   (traces
@@ -1834,160 +1448,38 @@
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv (enc "login-successful" enc_cookie (hash cookie cc id)))
       (send (enc "malicious request" enc_cookie (hash cookie cc id)))
-      (send (enc "actual request" enc_cookie (hash cookie cc id)))
+      (send (enc "request" enc_cookie (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
       (recv (enc id (hash cookie cc id)))
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 39)
-  (parent 33)
-  (seen 28)
+  (label 31)
+  (parent 27)
+  (seen 24)
   (unrealized (0 4) (0 6) (5 0))
   (comment "1 in cohort - 0 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (deflistener (hash cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (4 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 6) (3 0)) ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0))
-    ((4 1) (3 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation nonce-test (added-listener (hash cookie cc id)) cookie
-    (3 0) (enc cookie (pubk p))
-    (enc "login-successful"
-      (enc cookie (hash sskey (hash cookie cc id)))
-      (hash cookie cc id)))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 40)
-  (parent 34)
-  (unrealized (3 0) (4 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "malicious request") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (deflistener (hash cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (4 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 6) (3 0)) ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0))
-    ((4 1) (3 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation nonce-test (added-listener (hash cookie cc id)) cookie
-    (3 0) (enc cookie (pubk p))
-    (enc "login-successful"
-      (enc cookie (hash sskey (hash cookie cc id)))
-      (hash cookie cc id)))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 41)
-  (parent 35)
-  (unrealized (3 0) (4 0))
-  (comment "1 in cohort - 1 not yet seen"))
-
-(defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id)
     (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
+    (s cookie) (cred cred) (iv iv) (cookie cookie) (answer answer)
+    (sskey sskey) (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
@@ -1995,10 +1487,10 @@
     ((0 5) (1 5)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (3 0))
     ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0)) ((4 1) (3 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (added-listener (hash cookie cc id)) cookie
     (3 0) (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -2008,53 +1500,53 @@
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv (enc "login-successful" enc_cookie (hash cookie cc id)))
       (send (enc "malicious request" enc_cookie (hash cookie cc id)))
-      (send (enc "actual request" enc_cookie (hash cookie cc id)))
+      (send (enc "request" enc_cookie (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
       (recv (enc id (hash cookie cc id)))
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 42)
-  (parent 36)
+  (label 32)
+  (parent 28)
   (unrealized (3 0) (4 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (4 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (3 0))
+    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
     ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (added-listener (hash cookie cc id)) cookie
     (3 0) (enc cookie (pubk p))
-    (enc "actual request" (enc cookie (hash sskey (hash cookie cc id)))
-      (hash cookie cc id))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id))) (hash cookie cc id))
-    (enc "malicious request"
-      (enc cookie (hash sskey (hash cookie cc id)))
+    (enc "malicious request" iv
+      (enc cookie (hash sskey (hash cookie cc id))) (hash cookie cc id))
+    (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
     ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
@@ -2062,16 +1554,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -2079,39 +1570,40 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 43)
-  (parent 37)
-  (unrealized (0 4) (0 6) (3 0) (4 0))
+  (label 33)
+  (parent 29)
+  (unrealized (0 4) (3 0) (4 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (5 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (3 0))
+    ((0 5) (1 5)) ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
     ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
     ((5 1) (4 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation encryption-test (added-listener (cat cookie cc id))
     (hash cookie cc id) (4 0))
   (traces
@@ -2120,16 +1612,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -2137,152 +1628,30 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 44)
-  (parent 38)
-  (unrealized (0 4) (0 6) (5 0))
+  (label 34)
+  (parent 30)
+  (unrealized (0 4) (5 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "actual request") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (5 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 6) (3 0)) ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0))
-    ((4 1) (3 0)) ((5 1) (4 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation encryption-test (added-listener (cat cookie cc id))
-    (hash cookie cc id) (4 0))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 45)
-  (parent 40)
-  (seen 34)
-  (unrealized (5 0))
-  (comment "1 in cohort - 0 not yet seen"))
-
-(defskeleton sbp
-  (vars (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request "malicious request") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (5 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4))
-    ((1 6) (3 0)) ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0))
-    ((4 1) (3 0)) ((5 1) (4 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation encryption-test (added-listener (cat cookie cc id))
-    (hash cookie cc id) (4 0))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 46)
-  (parent 41)
-  (seen 35)
-  (unrealized (5 0))
-  (comment "1 in cohort - 0 not yet seen"))
-
-(defskeleton sbp
-  (vars (enc_cookie mesg) (cred answer cc id cookie sskey data)
+  (vars (enc_cookie mesg) (cred answer iv cc id cookie sskey data)
     (c p name))
   (defstrand client 10 (enc_cookie enc_cookie) (cc cc) (id id)
     (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request "login-successful") (cc cc) (id id)
-    (s cookie) (cred cred) (cookie cookie) (answer answer) (sskey sskey)
-    (c c) (p p))
+    (s cookie) (cred cred) (iv iv) (cookie cookie) (answer answer)
+    (sskey sskey) (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
@@ -2292,7 +1661,7 @@
     ((1 8) (0 9)) ((2 1) (0 6)) ((3 1) (2 0)) ((4 1) (3 0))
     ((5 1) (4 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation encryption-test (added-listener (cat cookie cc id))
     (hash cookie cc id) (4 0))
   (traces
@@ -2302,18 +1671,18 @@
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv (enc "login-successful" enc_cookie (hash cookie cc id)))
       (send (enc "malicious request" enc_cookie (hash cookie cc id)))
-      (send (enc "actual request" enc_cookie (hash cookie cc id)))
+      (send (enc "request" enc_cookie (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
       (recv (enc id (hash cookie cc id)))
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
@@ -2321,30 +1690,31 @@
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 47)
-  (parent 42)
-  (seen 36)
+  (label 35)
+  (parent 32)
+  (seen 28)
   (unrealized (5 0))
   (comment "1 in cohort - 0 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (5 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (3 0))
+    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
     ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
     ((5 1) (4 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation encryption-test (added-listener (cat cookie cc id))
     (hash cookie cc id) (4 0))
   (traces
@@ -2353,16 +1723,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -2370,160 +1739,163 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 48)
-  (parent 43)
-  (unrealized (0 4) (0 6) (5 0))
+  (label 36)
+  (parent 33)
+  (unrealized (0 4) (5 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (5 0)) ((1 8) (0 9))
-    ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0)) ((5 1) (4 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation nonce-test (displaced 6 1 proxy 7) cookie (5 0)
-    (enc cookie (pubk p)))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 49)
-  (parent 44)
-  (seen 32)
-  (unrealized (0 4) (0 6) (5 0))
-  (comment "1 in cohort - 0 not yet seen"))
-
-(defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (5 0)) ((1 8) (0 9))
-    ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0)) ((5 1) (4 0)))
-  (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
-  (operation nonce-test (displaced 6 1 proxy 7) cookie (5 0)
-    (enc cookie (pubk p)))
-  (traces
-    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
-      (send (enc id (hash cookie cc id)))
-      (recv (enc cc (hash cookie cc id)))
-      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (recv
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "malicious request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
-      (recv (enc id (hash cookie cc id)))
-      (send (enc cc (hash cookie cc id)))
-      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
-      (send
-        (enc "login-successful"
-          (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
-          (hash cookie cc id)))
-      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
-    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
-    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 50)
-  (parent 48)
-  (unrealized (0 4) (0 6) (5 0))
-  (comment "2 in cohort - 2 not yet seen"))
-
-(defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
-  (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
-  (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (deflistener (hash cookie cc id))
-  (deflistener (cat cookie cc id))
-  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
-    ((0 7) (5 0)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (5 0))
+    ((0 7) (3 0)) ((1 1) (0 1)) ((1 6) (0 6)) ((1 6) (5 0))
     ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
     ((5 1) (4 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
+  (operation nonce-test (displaced 6 1 proxy 7) cookie (5 0)
+    (enc cookie (pubk p)))
+  (traces
+    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
+      (send (enc id (hash cookie cc id)))
+      (recv (enc cc (hash cookie cc id)))
+      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
+      (recv
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (send
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
+    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
+      (recv (enc id (hash cookie cc id)))
+      (send (enc cc (hash cookie cc id)))
+      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (recv
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
+    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
+    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
+    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
+    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
+  (label 37)
+  (parent 34)
+  (seen 26)
+  (unrealized (0 4) (5 0))
+  (comment "1 in cohort - 0 not yet seen"))
+
+(defskeleton sbp
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
+  (defstrand client 10
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
+  (deflistener (hash cookie cc id))
+  (deflistener (cat cookie cc id))
+  (deflistener (hash cookie cc id))
+  (deflistener (cat cookie cc id))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
+    ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6)) ((1 6) (5 0))
+    ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
+    ((5 1) (4 0)))
+  (non-orig sskey (privk c) (privk p))
+  (uniq-gen cred answer iv cc id cookie)
+  (operation nonce-test (displaced 6 1 proxy 7) cookie (5 0)
+    (enc cookie (pubk p)))
+  (traces
+    ((send cc) (recv (cat id (pubk p))) (send (enc cookie (pubk p)))
+      (send (enc id (hash cookie cc id)))
+      (recv (enc cc (hash cookie cc id)))
+      (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
+      (recv
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (send
+        (enc "malicious request" iv
+          (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
+    ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
+      (recv (enc id (hash cookie cc id)))
+      (send (enc cc (hash cookie cc id)))
+      (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (recv
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
+          (hash cookie cc id)))
+      (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
+    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
+    ((recv (cat cookie cc id)) (send (cat cookie cc id)))
+    ((recv (hash cookie cc id)) (send (hash cookie cc id)))
+    ((recv (cat cookie cc id)) (send (cat cookie cc id))))
+  (label 38)
+  (parent 36)
+  (unrealized (0 4) (5 0))
+  (comment "2 in cohort - 2 not yet seen"))
+
+(defskeleton sbp
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
+  (defstrand client 10
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
+  (deflistener (hash cookie cc id))
+  (deflistener (cat cookie cc id))
+  (deflistener (hash cookie cc id))
+  (deflistener (cat cookie cc id))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
+    ((0 7) (5 0)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
+    ((5 1) (4 0)))
+  (non-orig sskey (privk c) (privk p))
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (displaced 6 0 client 8) cookie (5 0)
     (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -2532,16 +1904,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -2549,45 +1920,46 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 51)
-  (parent 50)
-  (seen 37)
-  (unrealized (0 4) (0 6) (5 0))
+  (label 39)
+  (parent 38)
+  (seen 29)
+  (unrealized (0 4) (5 0))
   (comment "1 in cohort - 0 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (6 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (5 0))
-    ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
-    ((5 1) (4 0)) ((6 1) (5 0)))
+    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 6) (5 0)) ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0))
+    ((4 1) (3 0)) ((5 1) (4 0)) ((6 1) (5 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation nonce-test (added-listener (hash cookie cc id)) cookie
     (5 0) (enc cookie (pubk p))
-    (enc "login-successful"
+    (enc "login-successful" iv
       (enc cookie (hash sskey (hash cookie cc id)))
       (hash cookie cc id)))
   (traces
@@ -2596,16 +1968,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -2613,11 +1984,11 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
@@ -2625,19 +1996,20 @@
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id))))
-  (label 52)
-  (parent 50)
-  (unrealized (0 4) (0 6) (5 0) (6 0))
+  (label 40)
+  (parent 38)
+  (unrealized (0 4) (5 0) (6 0))
   (comment "1 in cohort - 1 not yet seen"))
 
 (defskeleton sbp
-  (vars (request mesg) (cred answer cc id cookie sskey data) (c p name))
+  (vars (request mesg) (cred answer iv cc id cookie sskey data)
+    (c p name))
   (defstrand client 10
-    (enc_cookie (enc cookie (hash sskey (hash cookie cc id)))) (cc cc)
-    (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash cookie cc id)))))
+    (cc cc) (id id) (s cookie) (cred cred) (answer answer) (c c) (p p))
   (defstrand proxy 9 (request request) (cc cc) (id id) (s cookie)
-    (cred cred) (cookie cookie) (answer answer) (sskey sskey) (c c)
-    (p p))
+    (cred cred) (iv iv) (cookie cookie) (answer answer) (sskey sskey)
+    (c c) (p p))
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (deflistener (hash cookie cc id))
@@ -2645,11 +2017,11 @@
   (deflistener (hash cookie cc id))
   (deflistener (cat cookie cc id))
   (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 2) (7 0)) ((0 3) (1 3))
-    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (5 0))
-    ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0)) ((4 1) (3 0))
-    ((5 1) (4 0)) ((6 1) (5 0)) ((7 1) (6 0)))
+    ((0 5) (1 5)) ((0 8) (3 0)) ((1 1) (0 1)) ((1 6) (0 6))
+    ((1 6) (5 0)) ((1 8) (0 9)) ((2 1) (1 7)) ((3 1) (2 0))
+    ((4 1) (3 0)) ((5 1) (4 0)) ((6 1) (5 0)) ((7 1) (6 0)))
   (non-orig sskey (privk c) (privk p))
-  (uniq-gen cred answer cc id cookie)
+  (uniq-gen cred answer iv cc id cookie)
   (operation encryption-test (added-listener (cat cookie cc id))
     (hash cookie cc id) (6 0))
   (traces
@@ -2658,16 +2030,15 @@
       (recv (enc cc (hash cookie cc id)))
       (send (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (recv
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "malicious request"
+        (enc "malicious request" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send
-        (enc "actual request"
-          (enc cookie (hash sskey (hash cookie cc id)))
+        (enc "request" iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv cc) (send (cat id (pubk p))) (recv (enc cookie (pubk p)))
@@ -2675,11 +2046,11 @@
       (send (enc cc (hash cookie cc id)))
       (recv (enc (enc "login:" cred (privk c)) (hash cookie cc id)))
       (send
-        (enc "login-successful"
+        (enc "login-successful" iv
           (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (recv
-        (enc request (enc cookie (hash sskey (hash cookie cc id)))
+        (enc request iv (enc cookie (hash sskey (hash cookie cc id)))
           (hash cookie cc id)))
       (send (enc (enc "answer:" answer (privk p)) (hash cookie cc id))))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
@@ -2688,10 +2059,10 @@
     ((recv (cat cookie cc id)) (send (cat cookie cc id)))
     ((recv (hash cookie cc id)) (send (hash cookie cc id)))
     ((recv (cat cookie cc id)) (send (cat cookie cc id))))
-  (label 53)
-  (parent 52)
-  (seen 50)
-  (unrealized (0 4) (0 6) (7 0))
+  (label 41)
+  (parent 40)
+  (seen 38)
+  (unrealized (0 4) (7 0))
   (comment "1 in cohort - 0 not yet seen"))
 
 (comment "Nothing left to do")
