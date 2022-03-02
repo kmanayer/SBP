@@ -3,7 +3,7 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (cc id s cred request answer data) (enc_cookie mesg) (c p name))
+    (vars (cc cred answer data) (enc_cookie mesg) (c p name))
     (trace
       (send (enc "login:" cred (privk c)))
       (recv (cat "login-successful" enc_cookie)) 
