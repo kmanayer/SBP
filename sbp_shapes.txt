@@ -9,29 +9,92 @@
 
 (defprotocol sbp basic
   (defrole client
-    (vars (answer cookie sskey login_info data))
-    (trace (send login_info) (recv (enc cookie sskey))
-      (send (cat "request" (enc cookie sskey))) (recv answer)))
+    (vars (cc id s cred answer data) (enc_cookie mesg) (c p name))
+    (trace (send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
+      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
+      (recv (enc "login-successful" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
+      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
+    (uniq-gen cc s))
   (defrole proxy
-    (vars (answer cookie sskey login_info data))
-    (trace (recv login_info) (send (enc cookie sskey))
-      (recv (cat "request" (enc cookie sskey))) (send answer))
-    (uniq-gen answer)))
+    (vars (cc id s cred iv cookie answer sskey data) (c p name))
+    (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (recv
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
+          (hash s cc id)))
+      (send (enc (enc "answer:" answer (privk p)) (hash s cc id))))
+    (non-orig sskey)
+    (uniq-gen id)))
 
 (defskeleton sbp
-  (vars (answer cookie sskey login_info data))
-  (defstrand client 4 (answer answer) (cookie cookie) (sskey sskey)
-    (login_info login_info))
+  (vars (enc_cookie mesg) (cred answer cc id s data) (c p name))
+  (defstrand client 9 (enc_cookie enc_cookie) (cc cc) (id id) (s s)
+    (cred cred) (answer answer) (c c) (p p))
+  (non-orig (privk c) (privk p))
+  (uniq-gen cc s)
   (traces
-    ((send login_info) (recv (enc cookie sskey))
-      (send (cat "request" (enc cookie sskey))) (recv answer)))
+    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
+      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
+      (recv (enc "login-successful" enc_cookie (hash s cc id)))
+      (send (enc "request" enc_cookie (hash s cc id)))
+      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
   (label 0)
+  (unrealized (0 4) (0 6) (0 8))
+  (origs)
+  (comment "3 in cohort - 3 not yet seen"))
+
+(defskeleton sbp
+  (vars (answer cc id s cred iv cookie sskey data) (p c name))
+  (defstrand client 9
+    (enc_cookie (cat iv (enc cookie (hash sskey (hash s cc id)))))
+    (cc cc) (id id) (s s) (cred cred) (answer answer) (c c) (p p))
+  (defstrand proxy 9 (cc cc) (id id) (s s) (cred cred) (iv iv)
+    (cookie cookie) (answer answer) (sskey sskey) (c c) (p p))
+  (precedes ((0 0) (1 0)) ((0 2) (1 2)) ((0 3) (1 3)) ((0 5) (1 5))
+    ((0 7) (1 7)) ((1 1) (0 1)) ((1 4) (0 4)) ((1 6) (0 6))
+    ((1 8) (0 8)))
+  (non-orig sskey (privk p) (privk c))
+  (uniq-gen cc id s)
+  (operation encryption-test (displaced 2 0 client 8)
+    (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
+      (hash s cc id)) (1 7))
+  (traces
+    ((send cc) (recv (cat id (pubk p))) (send (enc s (pubk p)))
+      (send (enc id (hash s cc id))) (recv (enc cc (hash s cc id)))
+      (send (enc (enc "login:" cred (privk c)) (hash s cc id)))
+      (recv
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
+          (hash s cc id)))
+      (recv (enc (enc "answer:" answer (privk p)) (hash s cc id))))
+    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (recv (enc (enc "login:" cred (privk c)) (hash s cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (recv
+        (enc "request" iv (enc cookie (hash sskey (hash s cc id)))
+          (hash s cc id)))
+      (send (enc (enc "answer:" answer (privk p)) (hash s cc id)))))
+  (label 26)
+  (parent 0)
   (unrealized)
   (shape)
   (maps
     ((0)
-      ((answer answer) (cookie cookie) (sskey sskey)
-        (login_info login_info))))
+      ((cred cred) (answer answer) (c c) (p p) (cc cc) (id id) (s s)
+        (enc_cookie
+          (cat iv (enc cookie (hash sskey (hash s cc id))))))))
   (origs))
 
 (comment "Nothing left to do")
