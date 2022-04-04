@@ -22,13 +22,13 @@
       (recv (enc id (hash s cc id)))
       (send (enc cc (hash s cc id)))
 
-      (recv (enc          (enc "login:" cred (privk c))       (hash s cc id)))
+      (recv (enc          (enc "login:" cred (privk c))      (hash s cc id)))
       (send (enc           "login-successful" (cat iv 
-                  (enc cookie (hash sskey (hash s cc id))))   (hash s cc id)))
+                  (enc cookie (hash sskey (hash s cc id))))  (hash s cc id)))
 
       (recv (enc               "request" (cat iv 
-                  (enc cookie (hash sskey (hash s cc id))))   (hash s cc id)))
-      (send (enc       (enc "answer:" answer (privk p))       (hash s cc id)))
+                  (enc cookie (hash sskey (hash s cc id))))  (hash s cc id)))
+      (send (enc       (enc "answer:" answer (privk p))      (hash s cc id)))
     )
     (uniq-gen id)
     (non-orig sskey)
