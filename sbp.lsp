@@ -3,18 +3,18 @@
 (defprotocol sbp basic
 
   (defrole client
-    (vars (cc cred answer data) (enc_cookie mesg) (c p name))
+    (vars (cred answer data) (enc_cookie mesg))
     (trace
-      (send (enc "login:" cred (privk c)))
-      (recv (cat "login-successful" enc_cookie)) 
+      (send (cat             "login" cred            ))
+      (recv (cat    "login-successful" enc_cookie    )) 
 
-      (send (cat "request" enc_cookie)) 
-      (recv (enc "answer:" answer (privk p)))
+      (send (cat       "request" "get" enc_cookie    )) 
+      (recv (cat           "answer" answer           ))
     )
   )
   
   (defrole proxy
-    (vars (cc id s cred iv cookie answer sskey data) (c p name))
+    (vars (cc id s cred iv cookie sskey answer data) (request mesg) (p name))
     (trace
       (recv cc)
       (send (cat id (pubk p)))
@@ -22,29 +22,29 @@
       (recv (enc id (hash s cc id)))
       (send (enc cc (hash s cc id)))
 
-      (recv (enc          (enc "login:" cred (privk c))      (hash s cc id)))
+      (recv (enc                "login" cred                  (hash s cc id)))
       (send (enc           "login-successful" (cat iv 
-                  (enc cookie (hash sskey (hash s cc id))))  (hash s cc id)))
+                  (enc cookie (hash sskey (hash s cc id))))   (hash s cc id)))
 
-      (recv (enc               "request" (cat iv 
-                  (enc cookie (hash sskey (hash s cc id))))  (hash s cc id)))
-      (send (enc       (enc "answer:" answer (privk p))      (hash s cc id)))
+      (recv (enc            "request" request (cat iv 
+                  (enc cookie (hash sskey (hash s cc id))))   (hash s cc id)))
+      (send (enc              "answer" answer                 (hash s cc id)))
     )
     (uniq-gen id)
+    (uniq-gen iv)
     (non-orig sskey)
   )
 )
 
 (defskeleton sbp
-  (vars (cred answer iv data) (c p name))
-  (defstrandmax client (cred cred) (answer answer) (c c) (p p))
-  (defstrandmax proxy  (cred cred) (answer answer) (iv iv) (c c) (p p))
+  (vars (cred answer data) (p name))
+  (defstrandmax client (cred cred) (answer answer))
+  (defstrandmax proxy  (cred cred) (answer answer) (p p))
   (uniq-gen cred)
   (uniq-gen answer)
-  (uniq-gen iv)
-  (non-orig (privk c))
   (non-orig (privk p))
 )
+
 
   ;;(uniq-gen cc)
   ;;(uniq-gen s)

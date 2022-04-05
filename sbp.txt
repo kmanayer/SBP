@@ -5,29 +5,91 @@
 
 (defprotocol sbp basic
   (defrole client
-    (vars (answer cookie sskey login_info data))
-    (trace (send login_info) (recv (enc cookie sskey))
-      (send (cat "request" (enc cookie sskey))) (recv answer)))
+    (vars (cred answer data) (enc_cookie mesg))
+    (trace (send (cat "login" cred))
+      (recv (cat "login-successful" enc_cookie))
+      (send (cat "request" "get" enc_cookie))
+      (recv (cat "answer" answer))))
   (defrole proxy
-    (vars (answer cookie sskey login_info data))
-    (trace (recv login_info) (send (enc cookie sskey))
-      (recv (cat "request" (enc cookie sskey))) (send answer))
-    (uniq-gen answer)))
+    (vars (cc id s cred iv cookie sskey answer data) (request mesg)
+      (p name))
+    (trace (recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (recv (enc "login" cred (hash s cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (recv
+        (enc "request" request iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send (enc "answer" answer (hash s cc id))))
+    (non-orig sskey)
+    (uniq-gen id iv)))
 
 (defskeleton sbp
-  (vars (answer cookie sskey login_info data))
-  (defstrand client 4 (answer answer) (cookie cookie) (sskey sskey)
-    (login_info login_info))
+  (vars (enc_cookie request mesg)
+    (cred answer cc id s iv cookie sskey data) (p name))
+  (defstrand client 4 (enc_cookie enc_cookie) (cred cred)
+    (answer answer))
+  (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
+    (iv iv) (cookie cookie) (sskey sskey) (answer answer) (p p))
+  (non-orig sskey (privk p))
+  (uniq-gen cred answer id iv)
   (traces
-    ((send login_info) (recv (enc cookie sskey))
-      (send (cat "request" (enc cookie sskey))) (recv answer)))
+    ((send (cat "login" cred))
+      (recv (cat "login-successful" enc_cookie))
+      (send (cat "request" "get" enc_cookie))
+      (recv (cat "answer" answer)))
+    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (recv (enc "login" cred (hash s cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (recv
+        (enc "request" request iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send (enc "answer" answer (hash s cc id)))))
   (label 0)
+  (unrealized (0 3) (1 5))
+  (preskeleton)
+  (origs)
+  (comment "Not a skeleton"))
+
+(defskeleton sbp
+  (vars (enc_cookie request mesg)
+    (cred answer cc id s iv cookie sskey data) (p name))
+  (defstrand client 4 (enc_cookie enc_cookie) (cred cred)
+    (answer answer))
+  (defstrand proxy 9 (request request) (cc cc) (id id) (s s) (cred cred)
+    (iv iv) (cookie cookie) (sskey sskey) (answer answer) (p p))
+  (precedes ((0 0) (1 5)) ((1 8) (0 3)))
+  (non-orig sskey (privk p))
+  (uniq-gen cred answer id iv)
+  (traces
+    ((send (cat "login" cred))
+      (recv (cat "login-successful" enc_cookie))
+      (send (cat "request" "get" enc_cookie))
+      (recv (cat "answer" answer)))
+    ((recv cc) (send (cat id (pubk p))) (recv (enc s (pubk p)))
+      (recv (enc id (hash s cc id))) (send (enc cc (hash s cc id)))
+      (recv (enc "login" cred (hash s cc id)))
+      (send
+        (enc "login-successful" iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (recv
+        (enc "request" request iv
+          (enc cookie (hash sskey (hash s cc id))) (hash s cc id)))
+      (send (enc "answer" answer (hash s cc id)))))
+  (label 1)
+  (parent 0)
   (unrealized)
   (shape)
   (maps
-    ((0)
-      ((answer answer) (cookie cookie) (sskey sskey)
-        (login_info login_info))))
+    ((0 1)
+      ((cred cred) (answer answer) (p p) (enc_cookie enc_cookie) (cc cc)
+        (id id) (s s) (iv iv) (cookie cookie) (sskey sskey)
+        (request request))))
   (origs))
 
 (comment "Nothing left to do")
